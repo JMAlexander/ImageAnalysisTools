@@ -31,8 +31,7 @@ rain_drops = np.zeros(n_drops, dtype=[('position', float, 2),
 # random growth rates.
 rain_drops['position'] = np.random.uniform(0, 1, (n_drops, 2))
 rain_drops['growth'] = np.random.uniform(2, 100, n_drops)
-c_values = np.random.uniform(0, 1, 3)
-rain_drops['color'][:, :3] = np.random.uniform(0, 1, (n_drops, 3))
+rain_drops['color'][:, :3] = 1
 rain_drops['color'][:, 3] = 1
 
 
@@ -60,8 +59,7 @@ def update(frame_number):
     # color and growth factor.
     rain_drops['position'][current_index] = np.random.uniform(0, 1, 2)
     rain_drops['size'][current_index] = 5
-    c_values = np.random.uniform(0, 1, 3)
-    rain_drops['color'][current_index] = (c_values[0], c_values[1], c_values[2], 1)
+    rain_drops['color'][current_index] = (1, 1, 1, 1)
     rain_drops['growth'][current_index] = np.random.uniform(20, 100)
     
     # Update the scatter collection, with the new colors, sizes and positions.
