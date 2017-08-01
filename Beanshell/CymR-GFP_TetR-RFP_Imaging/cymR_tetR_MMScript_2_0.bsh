@@ -1,0 +1,393 @@
+import org.micromanager.data.Coords;
+import org.micromanager.data.Image;
+import org.micromanager.data.Datastore;
+import org.micromanager.display.DisplayWindow;
+import org.micromanager.acquisition.ChannelSpec;
+import mmcorej.TaggedImage;
+import org.micromanager.navigation.PositionList;
+import org.micromanager.api.PositionList;
+import org.micromanager.api.SequenceSettings;
+import org.micromanager.StagePosition;
+import org.micromanager.api.MultiStagePosition;
+import org.micromanager.navigation.MultiStagePosition;
+import org.micromanager.acquisition.AcquisitionManager;
+import org.micromanager.dialogs.AcqControlDlg;
+import java.util.ArrayList;
+import java.io.IOException;
+import java.util.List;
+import java.util.Arrays;
+import java.lang.String;
+import java.lang.Double;
+import java.lang.System;
+import java.lang.Object;
+import java.util.Date;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Window;
+import java.awt.Frame;
+import javax.swing.JFrame;
+
+
+acq = mm.acquisitions();
+dis = mm.displays();
+pm = mm.positions();
+
+
+// Initialize Variables
+file_prefix = "DATE_CELL-LINE_XX_";
+save_dir = "D:/Data/Jeff/XX_XX_2017/XXXX2017_XX/";
+
+log_file = save_dir + "MMlog.txt";
+f=new FileOutputStream(log_file);
+p=new PrintStream(f);
+
+print("");
+print("Automated MicroManager Imaging");
+p.println("Automated MicroManager Imaging");
+print("JMA -- Written 01-25-2017");
+p.println("JMA -- Written 01-25-2017");
+java.sql.Timestamp stamp = new java.sql.Timestamp(System.currentTimeMillis());
+Date date = new Date(stamp.getTime());
+p.println(date);
+print(date);
+
+int num_frames = XX;				// Number of timepoints
+int frame_interval = XXXXX;			// Spacing between timepoints
+int loop_pos = X;				// Number of positions to attempt per loop
+double scaling_factor = 1.0			// Multiply to standard laser settings.  Only if you want a bit extra.
+double z_start = 0;					// Z stack relative start
+double z_end = -9;					// Z stack relative stop
+double z_step = 0.3;
+
+
+//Laser Setup
+double stand_laser_reading_489 = 83.0; //uW
+double stand_laser_reading_561 = 116.0; //uW
+double stand_laser_reading_640 = 89.0; //uW
+double stand_laser_power_489 = 15.0; //%
+double stand_laser_power_561 = 30.0; //%
+double stand_laser_power_640 = 0.0; //%
+
+double cur_laser_reading_489 = XXX; //uW
+double cur_laser_reading_561 = XXX; //uW
+double cur_laser_reading_640 = XXX; //uW
+
+double laser_power_405 = 0.0;
+double laser_power_489 = ((stand_laser_reading_489 * stand_laser_power_489) / cur_laser_reading_489) * scaling_factor;
+double laser_power_561 = ((stand_laser_reading_561 * stand_laser_power_561) / cur_laser_reading_561) * scaling_factor;
+double laser_power_640 = ((stand_laser_reading_640 * stand_laser_power_640) / cur_laser_reading_640) * scaling_factor;
+
+mmc.setProperty("Laser-Shutter", "405nm mW   ", laser_power_405);
+mmc.setProperty("Laser-Shutter", "489nm mW     ", laser_power_489);
+mmc.setProperty("Laser-Shutter", "561nm mW      ", laser_power_561);
+mmc.setProperty("Laser-Shutter", "640nm mW       ", laser_power_640);
+
+
+// Initialize Constants
+int start_pos = 0;
+int stop_pos = 0;
+int img_count = 0;
+int offset = 15;
+boolean end_session = false;
+boolean TRUE = true;
+boolean re_adjust = false;
+boolean in_range = true;
+
+p.println("Num Frames: " + num_frames);
+p.println("Frame Inteveral: " + frame_interval + "ms");
+p.println("Z Start: " + z_start + "um");
+p.println("Z End: " + z_end + "um");
+p.println("Z Step: " + z_step + "um");
+p.println("405 Laser Power:" + laser_power_405 + "%");
+p.println("489 Laser Power:" + laser_power_489 + "%");
+p.println("561 Laser Power:" + laser_power_561 + "%");
+p.println("640 Laser Power:" + laser_power_640 + "%");
+
+print("Num Frames: " + num_frames);
+print("Frame Inteveral: " + frame_interval + "ms");
+print("Z Start: " + z_start + "um");
+print("Z End: " + z_end + "um");
+print("Z Step: " + z_step + "um");
+print("405 Laser Power:" + laser_power_405 + "%");
+print("489 Laser Power:" + laser_power_489 + "%");
+print("561 Laser Power:" + laser_power_561 + "%");
+print("640 Laser Power:" + laser_power_640 + "%");
+
+// Initialize Channels for Fast-Channel Acquisition
+GFP = new ChannelSpec();
+GFP.doZStack = true;
+GFP.config = "GFP"; //Change this!
+GFP.exposure = 15;
+GFP.color = Color.cyan;
+GFP.useChannel = true;
+GFP.camera = "Camera-1"; //Change this!
+
+RFP = new ChannelSpec();
+RFP.doZStack = true;
+RFP.config = "RFP"; //Change this!
+RFP.exposure = 15;
+RFP.color = Color.yellow;
+RFP.useChannel = true;
+RFP.camera = "Camera-1"; //Change this!
+
+p.println("GFP Exposure: " + GFP.exposure + "ms");
+p.println("RFP Exposure: " + RFP.exposure + "ms");
+
+print("GFP Exposure: " + GFP.exposure + "ms");
+print("RFP Exposure: " + RFP.exposure + "ms");
+
+List fast_active_channel = new ArrayList();
+fast_active_channel.add(GFP);
+fast_active_channel.add(RFP);
+
+
+coord_builder = mm.data().getCoordsBuilder();
+dummy_coords = mm.data().createCoords("");
+
+
+// Get Multi-XY Positions
+pl = pm.getPositionList();
+num_pos = pl.getNumberOfPositions();
+pos = pl.getPositions();
+
+// Set Z-Stack Features
+List slice_pos = new ArrayList();
+for (i=z_start; i > z_end; i = i - z_step){
+	slice_pos.add(i);
+}
+num_slices = slice_pos.size();
+
+
+// Get ImageList for Data Storage
+//List imgList = new ArrayList();
+GFP_RFP_settings = acq.getAcquisitionSettings();
+GFP_RFP_settings.channelGroup = "Fast-Channel";
+GFP_RFP_settings.channels = fast_active_channel;
+GFP_RFP_settings.keepShutterOpenChannels = true;
+GFP_RFP_settings.keepShutterOpenSlices = true;
+GFP_RFP_settings.numFrames = 1;
+GFP_RFP_settings.relativeZSlice = true;
+GFP_RFP_settings.save = false;
+GFP_RFP_settings.slices = slice_pos;
+GFP_RFP_settings.slicesFirst = false;
+GFP_RFP_settings.useAutofocus = true;
+GFP_RFP_settings.usePositionList = false;
+GFP_RFP_settings.shouldDisplayImages = false;
+
+
+p.println("Settings");
+p.println("---------");
+props = mmc.getSystemState().getVerbose();
+p.println(props);
+
+if ( num_pos > loop_pos ) {
+	start_pos = 0;
+	stop_pos = loop_pos;
+}
+else {
+	start_pos = 0;
+	stop_pos = num_pos;
+}
+	while (end_session != TRUE){
+ 	print("Positions");
+	print("---------");
+	print("Acquiring Stage Positions XY" + start_pos + "-" + stop_pos + "...");
+
+	if (stop_pos == num_pos) {
+		end_session = TRUE;
+	}
+	for (j=0; j < num_pos; j++) {
+	cur_pos = pos[j];
+	cur_pos.goToPosition(cur_pos, mmc);
+	mmc.waitForDevice("XYStage");
+	mmc.waitForDevice("TIZDrive");
+	orig_Z = mmc.getPosition("TIZDrive");
+	auto_position = mmc.getProperty("TIPFSStatus", "Status");
+	print(auto_position);
+	if (auto_position.equals("Out of focus search range")){
+		re_adjust = true;
+		in_range = false;
+		print("Stage drift detected.  Searching for autofocus range...");
+		p.println("Stage drift detected.  Searching for autofocus range...");
+		List scan_Zs = new ArrayList();
+		offset = 15;
+		bottom_Z = orig_Z - offset;
+		top_Z = orig_Z + offset;
+		scan_step = 0.5;
+		for (z=bottom_Z; z < top_Z; z = z + scan_step){
+			scan_Zs.add(z);
+		}
+
+					
+		for (k : scan_Zs){
+			new_Z = k;
+			print(new_Z);
+			mmc.setPosition("TIZDrive", new_Z);
+			mmc.waitForDevice("TIZDrive");
+			auto_position = mmc.getProperty("TIPFSStatus", "Status");
+			print(auto_position);
+			if (auto_position.equals("Within range of focus search") && in_range == false){
+				StagePosition new_sp_Z = new StagePosition();
+				new_sp_Z.numAxes = 1;
+				new_sp_Z.stageName = "TIZDrive";
+				new_sp_Z.x = new_Z + 0.75;	//Offset to get into the center of TIPFSStatus range
+
+				old_sp_Z = pos[j].get("TIZDrive");
+				pos[j].remove(old_sp_Z);
+				pos[j].add(new_sp_Z);
+				pl.setPositions(pos);
+				cur_pos = pos[j];
+							
+				in_range = true;
+
+				break;
+			}
+
+		}
+	}
+	}
+	store = null;
+	tmp_store = null;
+	display = null;
+
+	Datastore store = mm.data().createRAMDatastore();
+	Datastore tmp_store = mm.data().createRAMDatastore();
+	DisplayWindow display = dis.createDisplay(store);
+	cur_pos = pos[start_pos];
+	cur_pos.goToPosition(cur_pos, mmc);
+
+	System.gc();
+	// Execute Imaging
+	for (i=0; i < num_frames; i++){  // Loop through for each time point desired
+		time1 = System.currentTimeMillis();
+		print("Time: " + (i + 1) + " at " + time1);
+		p.println("Time: " + (i + 1) + " at " + time1);
+		Datastore data1 = mm.data().createRAMDatastore();
+   
+	
+		for (j=start_pos; j < stop_pos; j++){  // Loop through each position
+				re_adjust = false;
+				cur_pos = pos[j];
+				cur_pos.goToPosition(cur_pos, mmc);
+				mmc.waitForDevice("XYStage");
+				mmc.waitForDevice("TIZDrive");
+
+				orig_Z = mmc.getPosition("TIZDrive");
+				auto_position = mmc.getProperty("TIPFSStatus", "Status");
+				if (auto_position.equals("Out of focus search range")){
+					re_adjust = true;
+					in_range = false;
+					print("Stage drift detected.  Searching for autofocus range...");
+					p.println("Stage drift detected.  Searching for autofocus range...");
+					List scan_Zs = new ArrayList();
+					offset=5;
+					bottom_Z = orig_Z - offset;
+					top_Z = orig_Z + offset;
+					scan_step = 0.5;
+					for (z=bottom_Z; z < top_Z; z = z + scan_step){
+						scan_Zs.add(z);
+					}
+
+					
+					for (k : scan_Zs){
+						new_Z = k;
+						print(new_Z);
+						mmc.setPosition("TIZDrive", new_Z);
+						mmc.waitForDevice("TIZDrive");
+						auto_position = mmc.getProperty("TIPFSStatus", "Status");
+						print(auto_position);
+						if (auto_position.equals("Within range of focus search") && in_range == false){
+							StagePosition new_sp_Z = new StagePosition();
+							new_sp_Z.numAxes = 1;
+							new_sp_Z.stageName = "TIZDrive";
+							new_sp_Z.x = new_Z + 0.75;	//Offset to get into the center of TIPFSStatus range
+
+							old_sp_Z = pos[j].get("TIZDrive");
+							pos[j].remove(old_sp_Z);
+							pos[j].add(new_sp_Z);
+							pl.setPositions(pos);
+							cur_pos = pos[j];
+							
+							in_range = true;
+
+							break;
+						}
+
+					}
+				}
+				
+				if (re_adjust == true){
+					cur_pos.goToPosition(cur_pos, mmc);
+					mmc.waitForDevice("XYStage");
+					mmc.waitForDevice("TIZDrive");
+				}
+
+				print("XY Position: " + cur_pos);
+				p.println("XY Position: " + cur_pos);
+				print("Capturing CymR and TetR data...");
+				p.println("Capturing CymR and TetR data...");
+				mmc.setChannelGroup("Fast-Channel");
+				data1 = acq.runAcquisitionWithSettings(GFP_RFP_settings, true);	
+
+				img_list = data1.getImagesMatching(dummy_coords);
+				for (a=0; a < img_list.size(); a++){
+					coords = img_list.get(a).getCoords();
+					coord_builder = coord_builder.time(i);
+					coord_builder = coord_builder.stagePosition(j);
+					coord_builder = coord_builder.z(coords.getZ());
+					coord_builder = coord_builder.channel(coords.getChannel());
+					new_coords = coord_builder.build();
+					tmp_img = img_list.get(a).copyAtCoords(new_coords);
+					store.putImage(tmp_img);
+				}			
+			
+		}
+		
+ 	data1 = null;
+	time_elapsed = System.currentTimeMillis() - time1;
+	wait_time = frame_interval - time_elapsed;
+	if (wait_time < 0){
+			print("Imaging not finished before next interval scheduled!");
+			p.println("Imaging not finished before next interval scheduled!");
+	}
+	else{
+	print("Time before next imaging round: " + wait_time + "ms");
+	p.println("Time before next imaging round: " + wait_time + "ms");
+	Thread.sleep(frame_interval - time_elapsed);		// Wait for next time frame.
+	}
+	}
+	// Set up next loop
+	for (b = start_pos; b < stop_pos; b++){
+		Datastore tmp_store = mm.data().createRAMDatastore();
+		coord_string = "p=" + b;
+		pos_coords = mm.data().createCoords(coord_string);
+		img_list = store.getImagesMatching(pos_coords);
+		for (a=0; a < img_list.size(); a++){
+					coords = img_list.get(a).getCoords();
+					coord_builder = coord_builder.time(coords.getTime());
+					coord_builder = coord_builder.stagePosition(0);
+					coord_builder = coord_builder.z(coords.getZ());
+					coord_builder = coord_builder.channel(coords.getChannel());
+					new_coords = coord_builder.build();
+					tmp_img = img_list.get(a).copyAtCoords(new_coords);
+					tmp_store.putImage(tmp_img);
+				}
+				
+				pos_num = b + 1;
+				save_path = save_dir + file_prefix + "XY0" + pos_num;
+				tmp_store.save(Datastore.SaveMode.MULTIPAGE_TIFF, save_path);
+				tmp_store = null;
+}
+
+	
+	start_pos = stop_pos;
+	stop_pos = stop_pos + loop_pos;
+	if (stop_pos > num_pos){
+		stop_pos = num_pos;
+	}
+	print("Imaging Session Completed.");
+	p.println("Imaging Session Completed.");
+	dis.closeAllDisplayWindows(false);
+	
+	}
+

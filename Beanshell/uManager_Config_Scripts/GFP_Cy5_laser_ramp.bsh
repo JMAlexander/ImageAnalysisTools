@@ -1,0 +1,278 @@
+import org.micromanager.data.Coords;
+import org.micromanager.data.Image;
+import org.micromanager.data.Datastore;
+import org.micromanager.display.DisplayWindow;
+import org.micromanager.acquisition.ChannelSpec;
+import mmcorej.TaggedImage;
+import org.micromanager.navigation.PositionList;
+import org.micromanager.api.PositionList;
+import org.micromanager.api.SequenceSettings;
+import org.micromanager.api.MultiStagePosition;
+import org.micromanager.navigation.MultiStagePosition;
+import org.micromanager.acquisition.AcquisitionManager;
+import org.micromanager.dialogs.AcqControlDlg;
+import java.util.ArrayList;
+import java.io.IOException;
+import java.util.List;
+import java.util.Arrays;
+import java.lang.String;
+import java.lang.Double;
+import java.lang.System;
+import java.lang.Object;
+import java.util.Date;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Window;
+import java.awt.Frame;
+import javax.swing.JFrame;
+
+
+acq = mm.acquisitions();
+dis = mm.displays();
+
+// Initialize Variables
+file_prefix = "012317_092915_2E5_CymR_Halox2_TetRtdGFP_tdMS2cp-tdtagRFP-T_02_";
+save_dir = "D:/Data/Jeff/02_02_2017/Batch36_02/";
+
+log_file = save_dir + "MMlog.txt";
+f=new FileOutputStream(log_file);
+p=new PrintStream(f);
+p.println("Automated MicroManager Imaging");
+p.println("JMA -- Written 01-25-2017");
+java.sql.Timestamp stamp = new java.sql.Timestamp(System.currentTimeMillis());
+Date date = new Date(stamp.getTime());
+p.println(date);
+
+// Initialize User-defined Variables
+int num_frames = 60;				// Number of timepoints
+int frame_interval = 20000;			// Spacing between timepoints
+double z_start = 0;					// Z stack relative start
+double z_end = -9;					// Z stack relative stop
+double z_step = 0.3;					// Z stack step
+int MS2_freq = 1;
+double laser_power_405 = 0.0;
+double laser_power_489 = 5.0;
+double laser_power_561 = 25.0;
+double laser_power_640 = 0.0;
+
+// Initialize Constants
+int MS2_count = 1;
+int start_pos = 0;
+int stop_pos = 0;
+int img_count = 0;
+boolean end_session = false;
+boolean TRUE = true;
+
+p.println("Num Frames: " + num_frames);
+p.println("Frame Inteveral: " + frame_interval + "ms");
+p.println("Z Start: " + z_start + "um");
+p.println("Z End: " + z_end + "um");
+p.println("Z Step: " + z_step + "um");
+
+// Initialize Channels for Fast-Channel Acquisition
+GFP = new ChannelSpec();
+GFP.doZStack = true;
+GFP.config = "GFP";
+GFP.exposure = 15;
+GFP.color = Color.cyan;
+GFP.useChannel = true;
+GFP.camera = "Camera-1";
+
+
+Cy5 = new ChannelSpec();
+Cy5.doZStack = true;
+Cy5.config = "Cy5";
+Cy5.exposure = 15;
+Cy5.color = Color.magenta;
+Cy5.useChannel = true;
+Cy5.camera = "Camera-1";
+
+
+p.println("GFP Exposure: " + GFP.exposure + "ms");
+p.println("Cy5 Exposure: " + Cy5.exposure + "ms");
+
+
+List fast_active_channel = new ArrayList();
+fast_active_channel.add(GFP);
+fast_active_channel.add(Cy5);
+
+store = null;
+tmp_store = null;
+display = null;
+
+Datastore store = mm.data().createRAMDatastore();
+Datastore tmp_store = mm.data().createRAMDatastore();
+DisplayWindow display = dis.createDisplay(store);
+coord_builder = mm.data().getCoordsBuilder();
+dummy_coords = mm.data().createCoords("");
+
+
+// Get Acquisition Settings
+settings = acq.getAcquisitionSettings();
+
+// Get Multi-XY Positions
+pl = mm.positions().getPositionList();
+num_pos = pl.getNumberOfPositions();
+cur_pos = pl.getPosition(0);
+
+// Set Z-Stack Features
+List slice_pos = new ArrayList();
+for (i=z_start; i > z_end; i = i - z_step){
+	slice_pos.add(i);
+}
+num_slices = slice_pos.size();
+
+// Set Focus Device to Piezo
+//mmc.setFocusDevice("Z");  // Set to Piezo
+//zPos = mmc.getPosition(mmc.getFocusDevice());
+
+// Get ImageList for Data Storage
+//List imgList = new ArrayList();
+GFP_Cy5_settings = acq.getAcquisitionSettings();
+GFP_Cy5_settings.channelGroup = "Fast-Channel";
+GFP_Cy5_settings.channels = fast_active_channel;
+GFP_Cy5_settings.keepShutterOpenChannels = true;
+GFP_Cy5_settings.keepShutterOpenSlices = true;
+GFP_Cy5_settings.numFrames = 1;
+GFP_Cy5_settings.prefix = "01242017_092915_2E5_CymRTetR";
+GFP_Cy5_settings.relativeZSlice = true;
+GFP_Cy5_settings.root = "D:/Data/Jeff/01_25_2017/";
+GFP_Cy5_settings.save = false;
+GFP_Cy5_settings.slices = slice_pos;
+GFP_Cy5_settings.slicesFirst = false;
+GFP_Cy5_settings.useAutofocus = true;
+GFP_Cy5_settings.usePositionList = false;
+GFP_Cy5_settings.zReference = 0.0;
+GFP_Cy5_settings.shouldDisplayImages = false;
+
+
+if ( num_pos > 4 ) {
+	start_pos = 0;
+	stop_pos = 4;
+}
+else {
+	start_pos = 0;
+	stop_pos = num_pos;
+}
+	while (end_session != TRUE){
+ 	print(start_pos);
+	print(stop_pos);
+
+	if (stop_pos == num_pos) {
+		end_session = TRUE;
+	}
+
+	cur_pos = pl.getPosition(start_pos);
+	cur_pos.goToPosition(cur_pos, mmc);
+
+
+	// Execute Imaging
+	for (i=0; i < (num_frames); i++){  // Loop through for each time point desired
+		time1 = System.currentTimeMillis();
+		print("Time Point: " + i);
+		p.println("Time Point: " + i);
+		Datastore data1 = mm.data().createRAMDatastore();
+		Datastore data2 = mm.data().createRAMDatastore();
+   
+	
+		for (j=start_pos; j < stop_pos; j++){  // Loop through each position
+				if (j == 0){
+				laser_power_489	= 1.5;
+				laser_power_640 = 15.0;
+				}
+				else if (j == 1){
+				laser_power_489 = 3.0;
+				laser_power_640 = 20.0;
+				}
+				else if (j == 2){
+				laser_power_489 = 4.5;
+				laser_power_640 = 25.0;
+				}
+				else if (j == 3){
+				laser_power_489 = 6.0;
+				laser_power_640 = 30.0;
+				}
+				else {
+				laser_power_489 = 10.0;
+				laser_power_640 = 25.0;
+				}
+				
+				mmc.setProperty("Laser-Shutter", "489nm mW     ", laser_power_489);
+				mmc.setProperty("Laser-Shutter", "640nm mW       ", laser_power_640);
+				
+				cur_pos = pl.getPosition(j);
+				cur_pos.goToPosition(cur_pos, mmc);
+				mmc.waitForDevice("XYStage");
+				
+				print("XY Position: " + cur_pos);
+				p.println("XY Position: " + cur_pos);
+				print("Capturing CymR and TetR data...");
+				p.println("Capturing CymR and TetR data...");
+				mmc.setChannelGroup("Fast-Channel");
+				data1 = acq.runAcquisitionWithSettings(GFP_Cy5_settings, true);	
+
+				img_list = data1.getImagesMatching(dummy_coords);
+				for (a=0; a < img_list.size(); a++){
+					coords = img_list.get(a).getCoords();
+					coord_builder = coord_builder.time(i);
+					coord_builder = coord_builder.stagePosition(j);
+					coord_builder = coord_builder.z(coords.getZ());
+					coord_builder = coord_builder.channel(coords.getChannel());
+					new_coords = coord_builder.build();
+					tmp_img = img_list.get(a).copyAtCoords(new_coords);
+					store.putImage(tmp_img);
+				}			
+			
+		
+		}
+	
+ 	data1 = null;
+	time_elapsed = System.currentTimeMillis() - time1;
+	wait_time = frame_interval - time_elapsed;
+	if (wait_time < 0){
+			print("Imaging not finished before next interval scheduled!");
+			p.println("Imaging not finished before next interval scheduled!");
+	}
+	else{
+	print("Time before next imaging round: " + wait_time + "ms");
+	p.println("Time before next imaging round: " + wait_time + "ms");
+	Thread.sleep(frame_interval - time_elapsed);		// Wait for next time frame.
+	}
+	}
+	// Set up next loop
+	for (b = start_pos; b < stop_pos; b++){
+		Datastore tmp_store = mm.data().createRAMDatastore();
+		coord_string = "p=" + b;
+		pos_coords = mm.data().createCoords(coord_string);
+		img_list = store.getImagesMatching(pos_coords);
+		for (a=0; a < img_list.size(); a++){
+					coords = img_list.get(a).getCoords();
+					coord_builder = coord_builder.time(coords.getTime());
+					coord_builder = coord_builder.stagePosition(0);
+					coord_builder = coord_builder.z(coords.getZ());
+					coord_builder = coord_builder.channel(coords.getChannel());
+					new_coords = coord_builder.build();
+					tmp_img = img_list.get(a).copyAtCoords(new_coords);
+					tmp_store.putImage(tmp_img);
+				}
+				tmp_store.setPreferredSaveMode(Datastore.SaveMode.MULTIPAGE_TIFF);
+				pos_num = b + 1;
+				save_path = save_dir + file_prefix + "XY0" + pos_num;
+				tmp_store.setSavePath(save_path);
+				tmp_store.save(Datastore.SaveMode.MULTIPAGE_TIFF, save_path);
+				tmp_store = null;
+}
+
+	
+	start_pos = stop_pos;
+	stop_pos = stop_pos + 4;
+	if (stop_pos > num_pos){
+		stop_pos = num_pos;
+	}
+	print("Imaging Session Completed.");
+	p.println("Imaging Session Completed.");
+	dis.closeAllDisplayWindows(false);
+	f.close();
+	}
+
+exit;
