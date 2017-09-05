@@ -1,0 +1,166 @@
+---
+title: "Estimating Error in Measurements of Sox2 Locus Tracking"
+author: "Jeff Alexander"
+date: "6/25/2017"
+output: html_document
+---
+###Live Cells/Low SNR
+###Estimating error in XY Measurements by streaming images of cuO/cymR spot
+####(which should have a separation distance of 0 nm)
+####Error from 1) Shot noise 2) Movement between frames
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(MASS)
+source('~/Library/Mobile Documents/com~apple~CloudDocs/Scripts/R/Scripts/Rfunctions.R')
+load("~/Library/Mobile Documents/com~apple~CloudDocs/Batch42_streaming.RData")
+```
+
+```{r}
+images <- unique(Batch42_streaming$C1_Image)
+for (i in images){
+  cur_data = Batch42_streaming[Batch42_streaming$C1_Image == i,];
+  for (j in 1:200){
+    if (nrow(cur_data[cur_data$C1_T.Value..frame. == (j - 1),]) != 0 && nrow(cur_data[cur_data$C1_T.Value..frame. == j,]) != 0){
+    cur_data[cur_data$C1_T.Value..frame. == j, "XY_Streaming Distance (um)"] <- sqrt((cur_data[cur_data$C1_T.Value..frame. == (j - 1), "C1_X.Value..um."] - cur_data[cur_data$C1_T.Value..frame. == j, "C1_X.Value..um."])^2 + (cur_data[cur_data$C1_T.Value..frame. == (j - 1), "C1_Y.Value..um."] - cur_data[cur_data$C1_T.Value..frame. == j, "C1_Y.Value..um."])^2);
+    }
+  }
+  Batch42_streaming[Batch42_streaming$C1_Image == i, "XY_Streaming Distance (um)"] <- cur_data$`XY_Streaming Distance (um)`
+}
+
+
+
+hist(Batch42_streaming$`XY_Streaming Distance (um)`, breaks=50)
+```
+
+```{r}
+x_error <- Batch42_streaming
+
+x_vals <- seq(0, 5, by=0.01)
+##XY error
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_density(data=x_error, aes(`XY_Streaming Distance (um)`), color="grey", fill="grey", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,0.5), breaks=c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,15), breaks=c(0, 5, 10, 15))
+gp
+```
+```{r}
+er_dens <- density(x_error$`XY_Streaming Distance (um)`, na.rm=TRUE)
+mode_xlocation <- er_dens$x[er_dens$y == max(er_dens$y)]
+mode_y <- max(er_dens$y)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_density(data=x_error, aes(`XY_Streaming Distance (um)`), color="grey", fill="grey", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,0.5), breaks=c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,15), breaks=c(0, 5, 10, 15))
+gp <- gp + geom_segment(aes(x=mode_xlocation, y=0, xend=mode_xlocation, yend=mode_y), linetype="dashed", color="white")
+gp <- gp + geom_text(aes(x = mode_xlocation + 0.005, y=mode_y + 0.1, label=c("Mode (48 nm)")), color="white", angle=45, hjust="left", size=4)
+gp
+```
+
+###Fixed Cells/High SNR
+###Estimating error in XY Measurements by streaming images of cuO/cymR spot
+####(which should have a separation distance of 0 nm)
+####Error from 1) Shot noise 2) Movement between frames
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(MASS)
+source('~/Library/Mobile Documents/com~apple~CloudDocs/Scripts/R/Scripts/Rfunctions.R')
+load("~/Library/Mobile Documents/com~apple~CloudDocs/Batch50_03_streaming.Rdata")
+```
+
+
+```{r}
+Batch50_03_streaming <- data.frame(BatchXX_data_combined_pairs_trackmate, "XY_Streaming.Distance..um."=NA)
+head(Batch50_03_streaming)
+```
+
+```{r}
+images <- unique(Batch50_03_streaming$C1_Image)
+for (i in images){
+  cur_data = Batch50_03_streaming[Batch50_03_streaming$C1_Image == i,];
+  for (j in 1:200){
+    if (nrow(cur_data[cur_data$C1_T.Value..frame. == (j - 1),]) != 0 && nrow(cur_data[cur_data$C1_T.Value..frame. == j,]) != 0){
+    cur_data[cur_data$C1_T.Value..frame. == j, "XY_Streaming.Distance..um."] <- sqrt((cur_data[cur_data$C1_T.Value..frame. == (j - 1), "C1_X.Value..um."] - cur_data[cur_data$C1_T.Value..frame. == j, "C1_X.Value..um."])^2 + (cur_data[cur_data$C1_T.Value..frame. == (j - 1), "C1_Y.Value..um."] - cur_data[cur_data$C1_T.Value..frame. == j, "C1_Y.Value..um."])^2);
+    }
+  }
+  Batch50_03_streaming[Batch50_03_streaming$C1_Image == i, "XY_Streaming.Distance..um."] <- cur_data$`XY_Streaming.Distance..um.`
+}
+
+
+
+hist(Batch50_03_streaming$`XY_Streaming.Distance..um.`, breaks=50)
+```
+
+```{r}
+x_error <- Batch50_03_streaming
+
+x_vals <- seq(0, 5, by=0.01)
+##XY error
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_density(data=x_error, aes(`XY_Streaming.Distance..um.`), color="grey", fill="grey", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,0.5), breaks=c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,70), breaks=c(0, 5, 10, 15, 20, 25))
+gp
+```
+```{r}
+er_dens <- density(x_error$`XY_Streaming.Distance..um.`, na.rm=TRUE)
+mode_xlocation <- er_dens$x[er_dens$y == max(er_dens$y)]
+mode_y <- max(er_dens$y)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_density(data=x_error, aes(`XY_Streaming.Distance..um.`), color="grey", fill="grey", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,0.5), breaks=c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,70), breaks=c(0, 5, 10, 15, 20, 25))
+gp <- gp + geom_segment(aes(x=mode_xlocation, y=0, xend=mode_xlocation, yend=mode_y), linetype="dashed", color="white")
+gp <- gp + geom_text(aes(x = mode_xlocation + 0.005, y=mode_y + 0.1, label=paste("Mode (", round(mode_xlocation * 1000), " nm)", sep = "")), color="white", angle=45, hjust="left", size=4)
+gp
+```
+
+###Live Cells/High SNR
+###Estimating error in XY Measurements by streaming images of cuO/cymR spot
+####(which should have a separation distance of 0 nm)
+####Error from 1) Shot noise 2) Movement between frames
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(MASS)
+source('~/Library/Mobile Documents/com~apple~CloudDocs/Scripts/R/Scripts/Rfunctions.R')
+load("~/Library/Mobile Documents/com~apple~CloudDocs/Batch50_06_streaming.Rdata")
+```
+
+
+```{r}
+Batch50_06_streaming <- data.frame(BatchXX_data_combined_pairs_trackmate, "XY_Streaming.Distance..um."=NA)
+head(Batch50_06_streaming)
+```
+
+```{r}
+images <- unique(Batch50_06_streaming$C1_Image)
+for (i in images){
+  cur_data = Batch50_06_streaming[Batch50_06_streaming$C1_Image == i,];
+  for (j in 1:200){
+    if (nrow(cur_data[cur_data$C1_T.Value..frame. == (j - 1),]) != 0 && nrow(cur_data[cur_data$C1_T.Value..frame. == j,]) != 0){
+    cur_data[cur_data$C1_T.Value..frame. == j, "XY_Streaming.Distance..um."] <- sqrt((cur_data[cur_data$C1_T.Value..frame. == (j - 1), "C1_X.Value..um."] - cur_data[cur_data$C1_T.Value..frame. == j, "C1_X.Value..um."])^2 + (cur_data[cur_data$C1_T.Value..frame. == (j - 1), "C1_Y.Value..um."] - cur_data[cur_data$C1_T.Value..frame. == j, "C1_Y.Value..um."])^2);
+    }
+  }
+  Batch50_06_streaming[Batch50_06_streaming$C1_Image == i, "XY_Streaming.Distance..um."] <- cur_data$`XY_Streaming.Distance..um.`
+}
+
+
+
+hist(Batch50_06_streaming$`XY_Streaming.Distance..um.`, breaks=50)
+```
+
+```{r}
+x_error <- Batch50_06_streaming
+
+x_vals <- seq(0, 5, by=0.01)
+##XY error
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_density(data=x_error, aes(`XY_Streaming.Distance..um.`), color="grey", fill="grey", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,0.5), breaks=c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,70), breaks=c(0, 5, 10, 15, 20, 25))
+gp
+```
+```{r}
+er_dens <- density(x_error$`XY_Streaming.Distance..um.`, na.rm=TRUE)
+mode_xlocation <- er_dens$x[er_dens$y == max(er_dens$y)]
+mode_y <- max(er_dens$y)
+
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_density(data=x_error, aes(`XY_Streaming.Distance..um.`), color="grey", fill="grey", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,0.5), breaks=c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,70), breaks=c(0, 5, 10, 15, 20, 25))
+gp <- gp + geom_segment(aes(x=mode_xlocation, y=0, xend=mode_xlocation, yend=mode_y), linetype="dashed", color="white")
+gp <- gp + geom_text(aes(x = mode_xlocation + 0.005, y=mode_y + 0.1, label=paste("Mode (", round(mode_xlocation * 1000), " nm)", sep = "")), color="white", angle=45, hjust="left", size=4)
+gp
+```

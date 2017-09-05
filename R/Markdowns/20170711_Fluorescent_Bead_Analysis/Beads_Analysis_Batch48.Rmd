@@ -1,0 +1,229 @@
+---
+title: "Beads Analysis Batch48"
+author: "Jeff Alexander"
+date: "07/11/17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plyr)
+```
+
+###Folder with data files
+```{r}
+datdir <- "/Users/Jeff/Desktop/06_19_2017_Batch48/06192017_06_Beads/06192017_Beads_2/"
+batch <- "Batch48"
+```
+
+###Import bead data and filter out positions at the edges
+```{r}
+##
+c1_dat <- paste(datdir, "C1_", batch, "_beads.txt", sep="")
+beads_C1 <- read.delim(c1_dat, sep = "\t", stringsAsFactors = FALSE)
+beads_C1 <- beads_C1[,1:5]
+beads_C1 <- beads_C1[!(beads_C1$C1_Position_X == 0 | beads_C1$C1_Position_Y == 0 | beads_C1$C1_Position_Z == 0),]
+beads_C1 <- beads_C1[!(beads_C1$C1_Position_X == 511 | beads_C1$C1_Position_Y == 511 | beads_C1$C1_Position_Z == 30),]
+head(beads_C1)
+##
+c2_dat <- paste(datdir, "C2_", batch, "_beads.txt", sep="")
+beads_C2 <- read.delim(c2_dat, sep = "\t", stringsAsFactors = FALSE)
+beads_C2 <- beads_C2[,1:5]
+beads_C2 <- beads_C2[!(beads_C2$C2_Position_X == 0 | beads_C2$C2_Position_Y == 0 | beads_C2$C2_Position_Z == 0),]
+beads_C2 <- beads_C2[!(beads_C2$C2_Position_X == 511 | beads_C2$C2_Position_Y == 511 | beads_C2$C2_Position_Z == 30),]
+head(beads_C2)
+##
+c3_dat <- paste(datdir, "C3_", batch, "_beads.txt", sep="")
+beads_C3 <- read.delim(c3_dat, sep = "\t", stringsAsFactors = FALSE)
+beads_C3 <- beads_C3[,1:5]
+beads_C3 <- beads_C3[!(beads_C3$C3_Position_X == 0 | beads_C3$C3_Position_Y == 0 | beads_C3$C3_Position_Z == 0),]
+beads_C3 <- beads_C3[!(beads_C3$C3_Position_X == 511 | beads_C3$C3_Position_Y == 511 | beads_C3$C3_Position_Z == 30),]
+head(beads_C3)
+```
+
+###Match beads between the three colors based on proximity
+```{r}
+images <- unique(beads_C1$C1_Image)
+beads <- data.frame()
+for (i in images){
+  c1_tab <- beads_C1[beads_C1$C1_Image == i,]
+  c2_tab <- beads_C2[beads_C2$C2_Image == i,]
+  c3_tab <- beads_C3[beads_C3$C3_Image == i,]
+  for (j in 1:nrow(c1_tab)){
+    C1_row <- j
+    C2_row <- 0
+    C3_row <- 0
+    all_tab <- data.frame()
+    for (k in 1:nrow(c2_tab)){
+      if (abs(c1_tab[C1_row, "C1_Position_X"] - c2_tab[k, "C2_Position_X"]) < 1.0 & abs(c1_tab[C1_row, "C1_Position_Y"] - c2_tab[k, "C2_Position_Y"]) < 1.0 & abs(c1_tab[C1_row, "C1_Position_Z"] - c2_tab[k, "C2_Position_Z"]) < 1.0){
+        C2_row <- k
+      }
+    }  
+    for (k in 1:nrow(c3_tab)){
+      if (abs(c1_tab[C1_row, "C1_Position_X"] - c3_tab[k, "C3_Position_X"]) < 1.0 & abs(c1_tab[C1_row, "C1_Position_Y"] - c3_tab[k, "C3_Position_Y"]) < 1.0 & abs(c1_tab[C1_row, "C1_Position_Z"] - c3_tab[k, "C3_Position_Z"]) < 1.0){
+        C3_row <- k
+      }
+    }
+    if (!(C2_row == 0) & !(C3_row == 0)){
+      all_tab <- cbind(c1_tab[C1_row,], c2_tab[C2_row,], c3_tab[C3_row,])
+      beads <- rbind(beads, all_tab)
+    }
+  }
+}
+
+head(beads)
+```
+
+
+##Calculate position shifts
+```{r}
+beads <- data.frame(beads, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+colnames(beads)[16:24] <- c("C1_X Value (um)", "C1_Y Value (um)", "C1_Z Value (um)", "C2_X Value (um)", "C2_Y Value (um)", "C2_Z Value (um)", "C3_X Value (um)", "C3_Y Value (um)", "C3_Z Value (um)")
+beads$`C1_X Value (um)` <- beads$C1_Position_X * 0.091; beads$`C1_Y Value (um)` <- beads$C1_Position_Y * 0.091; beads$`C1_Z Value (um)` <- beads$C1_Position_Z * 0.3;
+beads$`C2_X Value (um)` <- beads$C2_Position_X * 0.091; beads$`C2_Y Value (um)` <- beads$C2_Position_Y * 0.091; beads$`C2_Z Value (um)` <- beads$C2_Position_Z * 0.3;
+beads$`C3_X Value (um)` <- beads$C3_Position_X * 0.091; beads$`C3_Y Value (um)` <- beads$C3_Position_Y * 0.091; beads$`C3_Z Value (um)` <- beads$C3_Position_Z * 0.3;
+beads <- data.frame(beads, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+colnames(beads) <- c("C1_Image", "C1_SpotID", "C1_Position_X", "C1_Position_Y", "C1_Position_Z", "C2_Image", "C2_SpotID", "C2_Position_X", "C2_Position_Y", "C2_Position_Z", "C3_Image", "C3_SpotID", "C3_Position_X", "C3_Position_Y", "C3_Position_Z", "C1_X Value (um)", "C1_Y Value (um)", "C1_Z Value (um)", "C2_X Value (um)", "C2_Y Value (um)", "C2_Z Value (um)", "C3_X Value (um)", "C3_Y Value (um)", "C3_Z Value (um)", "C1_C2_X Distance (um)", "C2_C3_X Distance (um)", "C1_C3_X Distance (um)", "C1_C2_Y Distance (um)", "C2_C3_Y Distance (um)", "C1_C3_Y Distance (um)", "C1_C2_Z Distance (um)", "C2_C3_Z Distance (um)", "C1_C3_Z Distance (um)", "C2_C1_X Difference (um)", "C3_C1_X Difference (um)", "C2_C1_Y Difference (um)", "C3_C1_Y Difference (um)", "C2_C1_Z Difference (um)", "C3_C1_Z Difference (um)")
+beads$`C1_C2_X Distance (um)` <- sqrt((beads$`C1_X Value (um)` - beads$`C2_X Value (um)`)^2)
+beads$`C2_C3_X Distance (um)` <- sqrt((beads$`C2_X Value (um)` - beads$`C3_X Value (um)`)^2)
+beads$`C1_C3_X Distance (um)` <- sqrt((beads$`C1_X Value (um)` - beads$`C3_X Value (um)`)^2)
+beads$`C1_C2_Y Distance (um)` <- sqrt((beads$`C1_Y Value (um)` - beads$`C2_Y Value (um)`)^2)
+beads$`C2_C3_Y Distance (um)` <- sqrt((beads$`C2_Y Value (um)` - beads$`C3_Y Value (um)`)^2)
+beads$`C1_C3_Y Distance (um)` <- sqrt((beads$`C1_Y Value (um)` - beads$`C2_Y Value (um)`)^2)
+beads$`C2_C3_Z Distance (um)` <- sqrt((beads$`C2_Z Value (um)` - beads$`C3_Z Value (um)`)^2)
+beads$`C1_C3_Z Distance (um)` <- sqrt((beads$`C1_Z Value (um)` - beads$`C3_Z Value (um)`)^2)
+
+beads$`C2_C1_X Difference (um)` <- beads$`C2_X Value (um)` - beads$`C1_X Value (um)`;
+beads$`C3_C1_X Difference (um)` <- beads$`C3_X Value (um)` - beads$`C1_X Value (um)`;
+beads$`C2_C1_Y Difference (um)` <- beads$`C2_Y Value (um)` - beads$`C1_Y Value (um)`;
+beads$`C3_C1_Y Difference (um)` <- beads$`C3_Y Value (um)` - beads$`C1_Y Value (um)`;
+beads$`C2_C1_Z Difference (um)` <- beads$`C2_Z Value (um)` - beads$`C1_Z Value (um)`;
+beads$`C3_C1_Z Difference (um)` <- beads$`C3_Z Value (um)` - beads$`C1_Z Value (um)`;
+```
+
+
+##Visualize data
+```{r}
+par(mfrow=c(3,2), cex.main=0.8, cex=0.6, pch=16);
+plot(beads$`C1_Z Value (um)`, beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C2C1X Shift")
+plot(beads$`C1_Z Value (um)`, beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C3C1X Shift")
+plot(beads$`C1_Z Value (um)`, beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C2C1Y Shift")
+plot(beads$`C1_Z Value (um)`, beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C3C1Y Shift")
+plot(beads$`C1_Z Value (um)`, beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Z Position", ylab="C2C1Z Shift")
+plot(beads$`C1_Z Value (um)`, beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Z Position", ylab="C3C1Z Shift")
+plot(beads$`C1_X Value (um)`, beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C2C1X Shift")
+plot(beads$`C1_X Value (um)`, beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C3C1X Shift")
+plot(beads$`C1_X Value (um)`, beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C2C1Y Shift")
+plot(beads$`C1_X Value (um)`, beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C3C1Y Shift")
+plot(beads$`C1_X Value (um)`, beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="X Position", ylab="C2C1Z Shift")
+plot(beads$`C1_X Value (um)`, beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="X Position", ylab="C3C1Z Shift")
+plot(beads$`C1_Y Value (um)`, beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C2C1X Shift")
+plot(beads$`C1_Y Value (um)`, beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C3C1X Shift")
+plot(beads$`C1_Y Value (um)`, beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C2C1Y Shift")
+plot(beads$`C1_Y Value (um)`, beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C3C1Y Shift")
+plot(beads$`C1_Y Value (um)`, beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Y Position", ylab="C2C1Z Shift")
+plot(beads$`C1_Y Value (um)`, beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Y Position", ylab="C3C1Z Shift");
+```
+
+##Calculate Median Chromatic Shifts
+```{r}
+median(beads$`C2_C1_X Difference (um)`)
+median(beads$`C3_C1_X Difference (um)`)
+median(beads$`C2_C1_Y Difference (um)`)
+median(beads$`C3_C1_Y Difference (um)`)
+median(beads$`C2_C1_Z Difference (um)`)
+median(beads$`C3_C1_Z Difference (um)`)
+```
+```{r}
+par(mfrow=c(3,2), cex.main=0.8, cex=0.6, pch=16);
+fit <- lm(beads$`C2_C1_X Difference (um)` ~ beads$`C1_Z Value (um)`)
+plot(beads$`C1_Z Value (um)`, beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C2C1X Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_X Difference (um)` ~ beads$`C1_Z Value (um)`)
+plot(beads$`C1_Z Value (um)`, beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C3C1X Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C2_C1_Y Difference (um)` ~ beads$`C1_Z Value (um)`)
+plot(beads$`C1_Z Value (um)`, beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C2C1Y Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_Y Difference (um)` ~ beads$`C1_Z Value (um)`)
+plot(beads$`C1_Z Value (um)`, beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C3C1Y Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C2_C1_Z Difference (um)` ~ beads$`C1_Z Value (um)`)
+plot(beads$`C1_Z Value (um)`, beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Z Position", ylab="C2C1Z Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_Z Difference (um)` ~ beads$`C1_Z Value (um)`)
+plot(beads$`C1_Z Value (um)`, beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Z Position", ylab="C3C1Z Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C2_C1_X Difference (um)` ~ beads$`C1_X Value (um)`)
+plot(beads$`C1_X Value (um)`, beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C2C1X Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_X Difference (um)` ~ beads$`C1_X Value (um)`)
+plot(beads$`C1_X Value (um)`, beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C3C1X Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C2_C1_Y Difference (um)` ~ beads$`C1_X Value (um)`)
+plot(beads$`C1_X Value (um)`, beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C2C1Y Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_Y Difference (um)` ~ beads$`C1_X Value (um)`)
+plot(beads$`C1_X Value (um)`, beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C3C1Y Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C2_C1_Z Difference (um)` ~ beads$`C1_X Value (um)`)
+plot(beads$`C1_X Value (um)`, beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="X Position", ylab="C2C1Z Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_Z Difference (um)` ~ beads$`C1_X Value (um)`)
+plot(beads$`C1_X Value (um)`, beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="X Position", ylab="C3C1Z Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C2_C1_X Difference (um)` ~ beads$`C1_Y Value (um)`)
+plot(beads$`C1_Y Value (um)`, beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C2C1X Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_X Difference (um)` ~ beads$`C1_Y Value (um)`)
+plot(beads$`C1_Y Value (um)`, beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C3C1X Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C2_C1_Y Difference (um)` ~ beads$`C1_Y Value (um)`)
+plot(beads$`C1_Y Value (um)`, beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C2C1Y Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_Y Difference (um)` ~ beads$`C1_Y Value (um)`)
+plot(beads$`C1_Y Value (um)`, beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C3C1Y Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C2_C1_Z Difference (um)` ~ beads$`C1_Y Value (um)`)
+plot(beads$`C1_Y Value (um)`, beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Y Position", ylab="C2C1Z Shift")
+abline(fit)
+fit
+
+fit <- lm(beads$`C3_C1_Z Difference (um)` ~ beads$`C1_Y Value (um)`)
+plot(beads$`C1_Y Value (um)`, beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Y Position", ylab="C3C1Z Shift");
+abline(fit)
+fit
+
+```

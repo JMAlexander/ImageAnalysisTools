@@ -32,16 +32,22 @@ import ij.plugin.Duplicator
 import ij.plugin.filter.PlugInFilter
 import ij.process.ImageProcessor
 import emblcmci.BleachCorrection_MH as BleachCorrection_MH
+import emblcmci.BleachCorrection_ExpoFit as BleachCorrection_ExpoFit
 import java.util.Date;
 
 parser = argparse.ArgumentParser();
 parser.add_argument('-i', '--image', help='a directory that contains all the images for processing');
 parser.add_argument('-s', '--scale', action='store_true', default=False, help='scale when converting from 32bit to 16bit');
+parser.add_argument('-m', '--method', help='method of bleach correction.  Use "histogram" for histogram matching and "expofit" for exponential fitting');
 
 arg = parser.parse_args();
 
 image_directory = arg.image;
 scale = arg.scale;
+method = arg.method;
+if (method != "histogram" and method != "expofit"):
+    print("Invalid method invoked.  Call using --help for more details.")
+    exit();
 print('Image_directory:  ' + image_directory);
 
 
@@ -67,8 +73,12 @@ for i in image_list:
         IJ.run("Conversions...", " ");
     IJ.run("16-bit");
     imp_adj = IJ.getImage();
-    bc = BleachCorrection_MH(imp_adj);
-    bc.doCorrection();
+    if (method == "histogram"):
+        bc = BleachCorrection_MH(imp_adj);
+        bc.doCorrection()
+    elif (method == "expofit"):
+        bc = BleachCorrection_ExpoFit(imp_adj);
+        bc.core()
     mod_image = IJ.getImage();
     save_name = out_dir + '/' + i;
     print(save_name);

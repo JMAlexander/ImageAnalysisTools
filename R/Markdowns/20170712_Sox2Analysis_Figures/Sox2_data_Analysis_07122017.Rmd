@@ -1,0 +1,1484 @@
+---
+title: "Sox2_data_Analysis_07122017"
+author: "Jeff Alexander"
+date: "7/12/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(MASS)
+load("~/Library/Mobile Documents/com~apple~CloudDocs/Sox2_data_070617.RData")
+source('~/Library/Mobile Documents/com~apple~CloudDocs/Scripts/R/Scripts/Rfunctions.R');
+```
+
+###Define exponential decay function
+```{r}
+expo <- function(x, rate){
+return(2.78^(-rate*x))
+}
+``` 
+
+####Compare 4sec to 20sec dataset for 101515.C3 ESCs
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+x2 <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "101515.C3_ESC",]
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXY <- gpXY + geom_density(data=x2, aes(`Corrected XY_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0, linetype=2)
+gpXY
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XYZ Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0, linetype=2)
+gpXYZ
+```
+
+####Compare 4sec to 20sec dataset for 013116.2G8_ESCs
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+x2 <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "013116.2G8_ESC",]
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXY <- gpXY + geom_density(data=x2, aes(`Corrected XY_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0, linetype=2)
+gpXY
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XYZ Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0, linetype=2)
+gpXYZ
+```
+
+####How many cells are included in each set?
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+x2 <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "013116.2G8_ESC",]
+#20sec data
+length(unique(x1$C1_Image))
+#4sec data
+length(unique(x2$C1_Image))
+```
+
+####Compare 4sec to 20sec dataset for 101515.C3_NPCs
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_NPC",]
+x2 <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "101515.C3_NPC",]
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="tan", fill="tan", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXY <- gpXY + geom_density(data=x2, aes(`Corrected XY_Distance (um)`), color="tan", fill="tan", alpha=0.3, size=1.0, linetype=2)
+gpXY
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="tan", fill="tan", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XYZ Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="tan", fill="tan", alpha=0.3, size=1.0, linetype=2)
+gpXYZ
+```
+####How many cells are included in each set?
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_NPC",]
+x2 <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "101515.C3_NPC",]
+#20sec data
+length(unique(x1$C1_Image))
+#4sec data
+length(unique(x2$C1_Image))
+```
+
+####Compare 4sec to 20sec dataset for 022616.1C5 ESCs (SCR deletion)
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "022616.1C5_ESC",]
+x2 <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "022616.1C5_ESC",]
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXY <- gpXY + geom_density(data=x2, aes(`Corrected XY_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0, linetype=2)
+gpXY
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XYZ Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0, linetype=2)
+gpXYZ
+```
+
+####How many cells are included in each set?
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "022616.1C5_ESC",]
+x2 <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "022616.1C5_ESC",]
+#20sec data
+length(unique(x1$C1_Image))
+#4sec data
+length(unique(x2$C1_Image))
+```
+####Compare 4sec to 20sec dataset for WT and SCR del cells
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+x2 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "022616.1C5_ESC",]
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXY <- gpXY + geom_density(data=x2, aes(`Corrected XY_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0)
+gpXY
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XYZ Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0)
+gpXYZ
+```
+
+###What does the cell heterogeneity look like in SCR del cells
+```{r}
+x_tot <- Sox2_data_unsync_20sec
+cell_lines <- unique(x_tot$Cell_Line)
+for (l in cell_lines){
+
+x <- x_tot[x_tot$Cell_Line == l,]
+images <- unique(x$C1_Image)
+full_tracks <- c()
+mean_distance <- c()
+for (i in images){
+  if (length(x[x$C1_Image == i, "C1_T Value (frame)"]) > 90){
+    full_tracks <- c(full_tracks, i)
+    mean_distance <- c(mean_distance, mean(x[x$C1_Image == i, "Corrected XYZ_Distance (um)"]))
+  }
+}
+df <- data.frame(full_tracks, mean_distance)
+df
+r_im <- df
+r_im <- df[sample(nrow(df), 20, replace = FALSE),]
+r_im <- r_im[order(r_im$mean_distance),]
+xsub <- x[x$C1_Image %in% r_im$full_tracks,]
+xsub$C1_Image <- factor(xsub$C1_Image, levels=r_im$full_tracks)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_jitter(data=xsub, aes(x=`C1_Image`, y=`Corrected XYZ_Distance (um)`), pch=16, col="purple") + ylim(0,1)
+
+mval <- mean(x$`Corrected XYZ_Distance (um)`)
+lowq <- quantile(x$`Corrected XYZ_Distance (um)`, probs = 0.25)
+hiq <- quantile(x$`Corrected XYZ_Distance (um)`, probs = 0.75)
+
+gp <- gp + geom_hline(yintercept = mval, size=0.75, linetype="dotted", color="white") + geom_hline(yintercept = lowq, size=0.75, linetype="dotted", color="yellow") + geom_hline(yintercept = hiq, size=0.75, linetype="dotted", color="yellow") + xlab("Cells") + ylab("XYZ Distance (um)") + ggtitle(paste("Cell-to-cell Heterogeneity of Distance Measurements ", l,  sep=""))
+print(gp)
+
+hist(mean_distance, breaks=20, xlim=c(0,0.8))
+}
+```
+
+###Autocorrelation of 101515.C3 ESCs at 4sec sampling
+```{r}
+x <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + geom_hline(yintercept = -ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(-1,1))
+gp
+```
+
+###Autocorrelation of 101515.C3 ESCs at 4sec and 20sec sampling
+```{r}
+##4sec
+x <- Sox2_data_4sec[Sox2_data_4sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + geom_hline(yintercept = -ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(-1,1))
+
+##20sec
+x2 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x2$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x2[x2$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac2 <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac2[i + 1] <- mean(cc, na.rm=TRUE)
+}
+gp <- gp + geom_line(aes(x=seq(0,(length(ac2) - 1), by=1),y=ac2), color="red", size=1.2, linetype=2)
+gp
+```
+
+###Autocorrelation of 101515.C3 ESCs at 20sec sampling with exponential fit
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 90
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + geom_hline(yintercept = -ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(-1,1))
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1)), y=dexp(x=seq(0,(length(ac) - 1)), rate = 1.0), color="red", linetype=3)
+gp
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "022616.1C5_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + geom_hline(yintercept = -ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(-1,1))
+gp
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_NPC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + geom_hline(yintercept = -ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(-1,1))
+gp
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_NPC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + geom_hline(yintercept = -ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(-1,1))
+gp
+```
+###Ongoing Analysis
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 90
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + geom_hline(yintercept = -ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(-1,1))
+
+
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=1,b=-0.01,c=1,d=-0.1)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- exp.model$m$getPars()
+gp <- gp + geom_line(aes(x=seq(-2,100, by=0.01), y=params["a"]*expo(x = seq(-2,100, by=0.01), rate = params["b"]) + params["c"]*expo(x = seq(-2,100, by=0.01), rate = params["d"])), linetype="dotted", color="red", size=0.5)
+gp                        
+```
+ 
+  
+```{r}
+x_tot <- Sox2_data_unsync_20sec
+cell_lines <- unique(x_tot$Cell_Line)
+for (l in cell_lines){
+
+x <- x_tot[x_tot$Cell_Line == l,]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XY_Distance (um)"]
+  }
+}
+maxlag <- 90
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + geom_hline(yintercept = -ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(-1,1)) + ggtitle(paste("Autocorrelation with Two-term Exponential for line ", l,  sep=""))
+
+
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.5,b=-0.02,c=0.5,d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,100, by=0.01), y=params["a"]*expo(x = seq(-2,100, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,100, by=0.01), rate = -params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=75, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+print(gp)
+}
+
+```
+
+###What does the cell heterogeneity look like in SCR del cells
+```{r}
+set.seed(5)
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC", ]
+
+images <- unique(x$C1_Image)
+full_tracks <- c()
+mean_distance <- c()
+for (i in images){
+  if (length(x[x$C1_Image == i, "C1_T Value (frame)"]) > 90){
+    full_tracks <- c(full_tracks, i)
+    mean_distance <- c(mean_distance, mean(x[x$C1_Image == i, "Corrected XY_Distance (um)"]))
+  }
+}
+df <- data.frame(full_tracks, mean_distance)
+df
+r_im <- df
+r_im <- df[sample(nrow(df), 20, replace = FALSE),]
+r_im <- r_im[order(r_im$mean_distance),]
+xsub <- x[x$C1_Image %in% r_im$full_tracks,]
+xsub$C1_Image <- factor(xsub$C1_Image, levels=r_im$full_tracks)
+
+gp <- ggplot() + theme(panel.background = element_blank(),
+                       title = element_text(size=10, face="bold", color="white"),
+                       plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"),
+                       plot.background = element_rect(fill="black", color=NULL),
+                       panel.grid.major = element_blank(),
+                       panel.grid.minor = element_blank(),
+                       axis.line.x = element_line(size=1.2, color="white"),
+                       axis.line.y = element_line(size=1.2, color="white"),
+                       axis.text.x = element_text(size=6, color="white", angle=45, hjust=1),
+                       #axis.text.x = element_blank(),
+                       #axis.title.x=element_text(size=14, face="bold", color="white"),
+                       axis.title.x=element_blank(),
+                       axis.text.y = element_text(size=14, color="white"),
+                       axis.title.y=element_text(size=14, face="bold", color="white"),
+                       axis.ticks.x=element_blank(),
+                       axis.ticks.y = element_line(color="white"))
+
+gp <- gp + geom_jitter(data=xsub, aes(x=`C1_Image`, y=`Corrected XY_Distance (um)`), pch=16, col="lightblue") + ylim(0,1)
+
+
+gp <- gp + ylab("XY Distance (um)") + xlab("Cells") 
+#+ ggtitle(paste("Cell-to-cell Heterogeneity of Distance Measurements 101515.C3 ESCs",  sep=""))
+pdf(file='~/Desktop/101515C3_ESC_XYDist_20cells_stripchart.pdf', useDingbats=FALSE, width=6, height=4.5, bg='black')
+print(gp)
+#dev.off()
+
+hist(mean_distance, breaks=20, xlim=c(0,0.8))
+sd(mean_distance)
+
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected X_Distance (um)"]
+  }
+}
+maxlag <- 20
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 500))
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected Y_Distance (um)"]
+  }
+}
+maxlag <- 20
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 500))
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 30
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 500))
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected X_Distance (um)"]
+  }
+}
+maxlag <- 20
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 500))
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected Y_Distance (um)"]
+  }
+}
+maxlag <- 20
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 500))
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected Z_Distance (um)"]
+  }
+}
+maxlag <- 20
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value))/variance)
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 500))
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_NPC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected X_Distance (um)"]
+  }
+}
+maxlag <- 20
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value)))
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)/variance
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 500))
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected Y_Distance (um)"]
+  }
+}
+maxlag <- 50
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value)))
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)/variance
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 500))
+df <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac1 <- data.frame(matrix(data = NA, nrow=4, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  covar_values <- ((values[,1] - m_value) * (values[,2] - m_value))
+  ac1[1, i + 1] <- mean(covar_values, na.rm=TRUE)/variance
+  ac1[2, i + 1] <- sum(!is.na(covar_values))
+  ac1[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]  #Not clear this is valid to do.
+  ac1[4, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac1) - 1, by=1),y=unlist(ac1[1,])), color="lightblue", size=1.0) + scale_y_continuous(limits = c(0,1))
+gp <- gp + geom_ribbon(aes(x=seq(0,ncol(ac1) - 1, by=1), ymin=unlist(ac1[3,]), ymax=unlist(ac1[4,])), fill="lightblue", alpha=0.6)
+
+
+### 013116.2G8 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac2 <- data.frame(matrix(data = NA, nrow=5, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  OK <- complete.cases(values[,1], values[,2])
+  values <- values[OK,]
+  covar_values <- (values[,1] - mean(values[,1], na.rm=TRUE)) * (values[,2] - mean(values[,2], na.rm=TRUE))
+  ac2[1, i + 1] <- mean(covar_values, na.rm=TRUE)/(sd(values[,1], na.rm = TRUE) * sd(values[,2], na.rm=TRUE))
+  ac2[2, i + 1] <- sum(!is.na(covar_values))
+  ac2[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]  #Not clear this is valid to do.
+  ac2[4, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+  ac2[5, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+}
+colnames(values) <- c("x1", "x2")
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac2) - 1, by=1),y=unlist(ac2[1,])), color="salmon", size=1.0)
+gp <- gp + geom_ribbon(aes(x=seq(0,ncol(ac2) - 1, by=1), ymin=unlist(ac2[3,]), ymax=unlist(ac2[4,])), fill="salmon", alpha=0.6)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac2) - 1, by=1),y=unlist(ac2[5,])), color="white", size=0.5, linetype="dotted")
+gp
+# x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+# images <- unique(x$C1_Image)
+# 
+# m <- matrix(nrow = length(images), ncol = 100, data = NA)
+# for (i in 1:length(images)){
+#   x_sub <- x[x$C1_Image == images[i],]
+#   frames <- x_sub$`C1_T Value (frame)`
+#   for (j in frames){
+#     m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+#   }
+# }
+# maxlag <- 40
+# numframes <- 100
+# df <- m
+# ndata <- length(m[!is.na(m)])
+# 
+# nseries <- nrow(df)
+# m_value <- mean(df, na.rm=TRUE)
+# variance <- sd(df, na.rm=TRUE)^2
+# 
+# ac2 <- array(NA, dim = (maxlag + 1))
+# for (i in 0:maxlag){
+#   cc <- c()
+#   for (j in 1:nseries){
+#     for (t in 1:(numframes - i)){
+#       cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value)))
+#     }
+#   }
+#   ac2[i + 1] <- mean(cc, na.rm=TRUE)/variance
+# }
+# gp <- gp + geom_line(aes(x=seq(0,(length(ac2) - 1), by=1),y=ac2), color="salmon", size=1.2)
+# ### 101515.C3 NPCs
+# x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_NPC",]
+# images <- unique(x$C1_Image)
+# 
+# m <- matrix(nrow = length(images), ncol = 100, data = NA)
+# for (i in 1:length(images)){
+#   x_sub <- x[x$C1_Image == images[i],]
+#   frames <- x_sub$`C1_T Value (frame)`
+#   for (j in frames){
+#     m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+#   }
+# }
+# maxlag <- 40
+# numframes <- 100
+# df <- m
+# ndata <- length(m[!is.na(m)])
+# 
+# nseries <- nrow(df)
+# m_value <- mean(df, na.rm=TRUE)
+# variance <- sd(df, na.rm=TRUE)^2
+# 
+# ac3 <- array(NA, dim = (maxlag + 1))
+# for (i in 0:maxlag){
+#   cc <- c()
+#   for (j in 1:nseries){
+#     for (t in 1:(numframes - i)){
+#       cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value)))
+#     }
+#   }
+#   ac3[i + 1] <- mean(cc, na.rm=TRUE)/variance
+# }
+# gp <- gp + geom_line(aes(x=seq(0,(length(ac3) - 1), by=1),y=ac3), color="lightblue", linetype="dashed", size=1.2)
+# ### 013116.2G8 NPCs
+# x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_NPC",]
+# images <- unique(x$C1_Image)
+# 
+# m <- matrix(nrow = length(images), ncol = 100, data = NA)
+# for (i in 1:length(images)){
+#   x_sub <- x[x$C1_Image == images[i],]
+#   frames <- x_sub$`C1_T Value (frame)`
+#   for (j in frames){
+#     m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+#   }
+# }
+# maxlag <- 40
+# numframes <- 100
+# df <- m
+# ndata <- length(m[!is.na(m)])
+# 
+# nseries <- nrow(df)
+# m_value <- mean(df, na.rm=TRUE)
+# variance <- sd(df, na.rm=TRUE)^2
+# 
+# ac4 <- array(NA, dim = (maxlag + 1))
+# for (i in 0:maxlag){
+#   cc <- c()
+#   for (j in 1:nseries){
+#     for (t in 1:(numframes - i)){
+#       cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value)))
+#     }
+#   }
+#   ac4[i + 1] <- mean(cc, na.rm=TRUE)/variance
+# }
+# gp <- gp + geom_line(aes(x=seq(0,(length(ac4) - 1), by=1),y=ac4), color="salmon", linetype="dashed", size=1.2)
+
+#gp
+#print(ci95)
+```
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 50
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      cc <- c(cc, ((df[j,t] - m_value) * (df[j, (t + i)] - m_value)))
+    }
+  }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)/variance
+}
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,(length(ac) - 1), by=1),y=ac), color="white", size=1.2)
+ci95 <- 1.96 / sqrt(ndata)
+gp <- gp + geom_hline(yintercept = ci95, linetype="dotted", color="blue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 50))
+df2 <- data.frame(x=seq(0,(length(ac) - 1)), y=ac)
+insertList = list(a=0.33,b=-0.02,c=0.33, d=-0.5)
+exp.model <- nls(y ~ a*exp(b*x) + c*exp(d*x), data=df2, start=insertList, control=list(maxiter=10000, minFactor=1/6096))
+exp.model
+params <- round(exp.model$m$getPars(), digits=2)
+#gp <- gp + geom_line(aes(x=seq(-2,500, by=0.01), y=params["a"]*expo(x = seq(-2,500, by=0.01), rate = -params["b"]) + params["c"]*expo(x = seq(-2,500, by=0.01), rate = -params["d"]) + params["c"]*expo(x=seq(-2,500, by=0.01), rate=-params["d"])), linetype="dotted", color="red", size=0.5)
+#gp <- gp + geom_text(aes(x=150, y=0.95, label=paste("y=", params["a"], "e^(", params["b"], "t) + ", params["c"], "e^(", params["d"], "t)", sep="")), color="red")
+gp
+print(ci95)
+```
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(ncol = length(images), nrow = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[j, i] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+
+m <- ts(m)
+a <-acf(m, lag.max=50, plot=FALSE, na.action = na.pass)
+```
+
+
+
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(ncol = length(images), nrow = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[j, i] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+
+m <- ts(m)
+a <-acf(m, lag.max=50, plot=FALSE, na.action = na.pass)
+```
+
+```{r}
+### 101515.C3 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac1 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac1[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac1[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac1[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac2) - 1, by=1),y=unlist(ac1[1,])), color="lightblue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(limits=c(0, 80))
+gp <- gp + geom_ribbon(aes(x=seq(0,ncol(ac2) - 1, by=1), ymin=unlist(ac1[2,]), ymax=unlist(ac1[3,])), fill="lightblue", alpha=0.6)
+
+### 013116.2G8 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac2 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac2[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac2[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac2[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac2) - 1, by=1),y=unlist(ac2[1,])), color="salmon", size=1.0)
+gp <- gp + geom_ribbon(aes(x=seq(0,ncol(ac2) - 1, by=1), ymin=unlist(ac2[2,]), ymax=unlist(ac2[3,])), fill="salmon", alpha=0.6)
+gp
+```
+
+```{r}
+### 101515.C3 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac1 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac1[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac1[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac1[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac1) - 1, by=1),y=unlist(ac1[1,])), color="lightblue", size=1.0) + xlab("Time lag (frames)") + ylab("Autocorrelation") + scale_x_continuous(limits=c(0, 80))
+gp <- gp + geom_ribbon(aes(x=seq(0,ncol(ac1) - 1, by=1), ymin=unlist(ac1[2,]), ymax=unlist(ac1[3,])), fill="lightblue", alpha=0.6)
+
+### 013116.2G8 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac2 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac2[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac2[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac2[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac2) - 1, by=1),y=unlist(ac2[1,])), color="salmon", size=1.0)
+gp <- gp + geom_ribbon(aes(x=seq(0,ncol(ac2) - 1, by=1), ymin=unlist(ac2[2,]), ymax=unlist(ac2[3,])), fill="salmon", alpha=0.6)
+
+### 101515.C3 NPCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_NPC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac3 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac3[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac3[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac3[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac3) - 1, by=1),y=unlist(ac3[1,])), color="lightblue", size=1.0, linetype="dashed")
+gp <- gp + geom_ribbon(aes(x=seq(0,ncol(ac3) - 1, by=1), ymin=unlist(ac3[2,]), ymax=unlist(ac3[3,])), fill="lightblue", alpha=0.6)
+
+### 013116.2G8 NPCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_NPC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 80
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac4 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac4[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac4[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac4[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+#ac <- autocor_series(data=m, seriesbycol = FALSE, maxlag = 40, frames = 100)
+gp <- gp + geom_line(aes(x=seq(0,ncol(ac4) - 1, by=1),y=unlist(ac4[1,])), color="salmon", size=1.0, linetype="dashed")
+gp <- gp + geom_ribbon(aes(x=seq(0,ncol(ac4) - 1, by=1), ymin=unlist(ac4[2,]), ymax=unlist(ac4[3,])), fill="salmon", alpha=0.6)
+gp
+```

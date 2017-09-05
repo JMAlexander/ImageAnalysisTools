@@ -1,0 +1,90 @@
+---
+title: "Autocorrelated Time Series Model"
+output: html_notebook
+---
+###Generate two correlated variables
+```{r}
+z1 <- rnorm(n=1000, mean=0, sd=1)
+z2 <- rnorm(n=1000, mean=0, sd=1)
+cor <- 0.8
+
+x1 <- z1
+x2 <- cor * z1 + sqrt(1 - cor^2) * z2
+```
+###Plot the results
+```{r}
+plot(x1, pch=16, col="black")
+plot(x2, pch=16, col="red")
+plot(x=x1,y=x2, pch=16)
+```
+
+###Function for generating autocorrelated time series
+```{r}
+autoFunc <- function(x, rho, dist){
+  y <- rho * x + sqrt(1 - rho^2) * sample(dist, size=1)
+  return(y)
+}
+```
+
+
+###Generate time series data using autocorrelation function
+```{r}
+z1 <- rnorm(n=1000, mean=0, sd=1)
+cor <- 0.9
+
+x1[1] <- z1[1]
+for (i in 2:length(z1)){
+  x1[i] <- autoFunc(x1[i - 1], cor, z1)
+}
+plot(z1, pch=16, col="black")
+plot(z2, pch=16, col="red")
+plot(x1,pch=16)
+```
+
+###Check to see the autocorrelation for lag of 1
+```{r}
+df <- x1
+ndata <- length(df[!is.na(df)])
+
+maxlag <- 80
+nseries <- 1
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac <- array(NA, dim = (maxlag + 1))
+for (i in 0:maxlag){
+  cc <- c()
+    for (t in 1:length(df)){
+      cc <- c(cc, ((df[t] - m_value) * (df[(t + i)] - m_value))/variance)
+    }
+  ac[i + 1] <- mean(cc, na.rm=TRUE)
+}
+
+ac[2]
+```
+
+###Retry using distance distribution
+```{r}
+x_dist <- rnorm(n=1000, mean=0, sd=1)
+y_dist <- rnorm(n=1000, mean=0, sd=1)
+cor <- 0.9
+x1 <- array(data=NA,dim = length(x_dist))
+y1 <- array(data=NA,dim = length(x_dist))
+xy <- array(data=NA,dim = length(x1))
+
+
+x1[1] <- x_dist[1]
+y1[1] <- y_dist[1]
+xy[1] <- sqrt(x1[1]^2 + y1[1]^2)
+
+for (i in 2:length(z1)){
+  x1[i] <- autoFunc(x1[i - 1], cor, x_dist)
+  y1[i] <- autoFunc(y1[i - 1], cor, y_dist)
+  xy[i] <- sqrt(x1[i]^2 + y1[i]^2)
+}
+
+
+plot(x_dist, pch=16, col="black")
+plot(xy,pch=16, col="lightblue")
+```
+

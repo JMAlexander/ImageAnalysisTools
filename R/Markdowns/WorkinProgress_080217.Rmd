@@ -1,0 +1,202 @@
+---
+title: "Untitled"
+author: "Jeff Alexander"
+date: "8/2/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(MASS)
+source('~/Library/Mobile Documents/com~apple~CloudDocs/Scripts/R/Scripts/Rfunctions.R');
+load('/Users/Jeff/Library/Mobile Documents/com~apple~CloudDocs/R_data/Sox2_data_080217.RData');
+```
+
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+x2 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "050917.2B4_ESC",]
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXY <- gpXY + geom_density(data=x2, aes(`Corrected XY_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0, linetype=2)
+gpXY
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XYZ Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="purple", fill="purple", alpha=0.3, size=1.0, linetype=2)
+gpXYZ
+```
+
+```{r}
+### 101515.C3 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac1 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac1[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac1[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac1[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20),y=unlist(ac1[1,])), color="lightblue", size=1.0) + xlab("Time lag (sec)") + ylab("3D Distance Autocorrelation") + scale_y_continuous(limits = c(-0.25,1)) + scale_x_continuous(limits=c(0, 800))
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20), ymin=unlist(ac1[2,]), ymax=unlist(ac1[3,])), fill="lightblue", alpha=0.6)
+
+### 013116.2G8 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac2 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac2[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac2[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac2[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac2) - 1, by=1) * 20),y=unlist(ac2[1,])), color="salmon", size=1.0)
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac2) - 1, by=1) * 20), ymin=unlist(ac2[2,]), ymax=unlist(ac2[3,])), fill="salmon", alpha=0.6)
+
+### 050917.2B4 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "050917.2B4_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac3 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac3[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac3[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac3[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac3) - 1, by=1) * 20),y=unlist(ac3[1,])), color="orange", size=1.0)
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac3) - 1, by=1) * 20), ymin=unlist(ac3[2,]), ymax=unlist(ac3[3,])), fill="orange", alpha=0.6)
+gp
+```
+
+```{r}
+### 101515.C3 ESCs
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+images <- unique(x$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x[x$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac1 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac1[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac1[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac1[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20),y=unlist(ac1[1,])), color="lightblue", size=1.0) + xlab("Time lag (sec)") + ylab("3D Distance Autocorrelation") + scale_y_continuous(limits = c(-0.25,1)) + scale_x_continuous(limits=c(0, 800))
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20), ymin=unlist(ac1[2,]), ymax=unlist(ac1[3,])), fill="lightblue", alpha=0.6)
+gp
+```
+
+```{r}
+x1 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+x2 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "013116.2G8_ESC",]
+x3 <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "050917.2B4_ESC",]
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("3D Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0)
+gpXYZ <- gpXYZ + geom_density(data=x3, aes(`Corrected XYZ_Distance (um)`), color="orange", fill="orange", alpha=0.3, size=1.0)
+gpXYZ
+```

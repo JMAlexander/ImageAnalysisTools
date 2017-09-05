@@ -1,0 +1,429 @@
+---
+title: "Making Figures for Presentation-DarzacqLabMeeting"
+author: "Jeff Alexander"
+date: "8/12/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(MASS)
+load("~/Box Sync/R_data/Sox2_data_081117.RData")
+source('~/Box Sync/Scripts/R/Scripts/Rfunctions.R');
+```
+
+```{r}
+x1 <- Sox2_data[Sox2_data$Repressor_Type == "CymRtagRFPTx2:TetRGFPx2" & Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Cell_Line == "101515.C3_ESC", ]
+x2 <- Sox2_data[Sox2_data$Repressor_Type == "CymRtagRFPTx2:TetRGFPx2" & Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Cell_Line == "013116.2G8_ESC", ]
+x3 <- Sox2_data[Sox2_data$Repressor_Type == "CymRGFP:TetRtdTom" & Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Cell_Line == "050917.2B4_ESC", ]
+
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXY <- gpXY + geom_density(data=x2, aes(`Corrected XY_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0)
+gpXY <- gpXY + geom_density(data=x3, aes(`Corrected XY_Distance (um)`), color="orange", fill="orange", alpha=0.3, size=1.0)
+gpXY
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.5), breaks=c(0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5)) + xlab("XYZ Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0, linetype=2)
+gpXYZ <- gpXYZ + geom_density(data=x3, aes(`Corrected XYZ_Distance (um)`), color="orange", fill="orange", alpha=0.3, size=1.0)
+gpXYZ
+```
+
+```{r}
+x1 <- Sox2_data[Sox2_data$Repressor_Type == "CymRtagRFPTx2:TetRGFPx2" & Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Cell_Line == "101515.C3_ESC", ]
+x2 <- Sox2_data[Sox2_data$Repressor_Type == "CymRtagRFPTx2:TetRGFPx2" & Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Cell_Line == "013116.2G8_ESC", ]
+x3 <- Sox2_data[Sox2_data$Repressor_Type == "CymRGFP:TetRtdTom" & Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Cell_Line == "050917.2B4_ESC", ]
+
+df <- rbind(x1, x2, x3)
+
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_boxplot(data=df, aes(y=`Relative_XY Displacement (um)`, x=`Cell_Line`))
+
+gpXY
+```
+
+```{r}
+x1 <- fixed_cells_total
+
+xydens <- density(x1$`Corrected XY_Distance (um)`)
+xyzdens <- density(x1$`Corrected XYZ_Distance (um)`)
+##XY
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,5), breaks=c(0, 1, 2, 3, 4,5))
+
+##XYZ
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.5), breaks=c(0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5)) + xlab("3D Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 1, 2, 3, 4, 5, 6))
+
+
+##Add in ribbon for middle 90% of observations
+XYq90 <- quantile(x1$`Corrected XY_Distance (um)`, .90)
+XYZq90 <- quantile(x1$`Corrected XYZ_Distance (um)`, .90)
+
+ddXY <- with(xydens,data.frame(x,y))
+gpXY <- gpXY + geom_ribbon(data=subset(ddXY, x<XYq90),aes(ymax=`y`, ymin=0, x=`x`),fill="lightblue",colour=NA,alpha=0.5)
+gpXY <- gpXY + geom_text(data = data.frame(quan=XYq90), aes(x = `quan` + 0.005, y=0.5, label=paste("90% (", round(XYq90 * 1000, digits = 0), "nm)")), color="white", angle=45, hjust="left", size=4)
+
+mean_xlocation <- mean(x1$`Corrected XY_Distance (um)`, na.rm=TRUE)
+gpXY <- gpXY + geom_segment(aes(x=mean_xlocation, y=0, xend=mean_xlocation, yend=3.5), linetype="dashed", color="white")
+gpXY <- gpXY + geom_text(aes(x = mean_xlocation + 0.005, y=3.5 + 0.2, label=paste("Mean (", round(mean_xlocation * 1000, digits=0), " nm)", sep="")), color="white", angle=45, hjust="left", size=4)
+
+mode_xlocation <- xydens$x[xydens$y == max(xydens$y)]
+mode_y <- max(xydens$y)
+gpXY <- gpXY + geom_segment(aes(x=mode_xlocation, y=0, xend=mode_xlocation, yend=mode_y), linetype="dashed", color="white")
+gpXY <- gpXY + geom_text(aes(x = mode_xlocation + 0.005, y=mode_y + 0.1, label=c("Mode (155 nm)")), color="white", angle=45, hjust="left", size=4)
+gpXY
+
+ddXYZ <- with(xyzdens,data.frame(x,y))
+gpXYZ <- gpXYZ + geom_ribbon(data=subset(ddXYZ, x<XYZq90),aes(ymax=`y`, ymin=0, x=`x`),fill="lightblue",colour=NA,alpha=0.5)
+gpXYZ <- gpXYZ + geom_text(data = data.frame(quan=XYZq90), aes(x = `quan` + 0.005, y=1.2, label=paste("90% (", round(XYZq90 * 1000, digits = 0), "nm)")), color="white", angle=45, hjust="left", size=4)
+
+mean_xlocation <- mean(x1$`Corrected XYZ_Distance (um)`, na.rm=TRUE)
+gpXYZ <- gpXYZ + geom_segment(aes(x=mean_xlocation, y=0, xend=mean_xlocation, yend=3.4), linetype="dashed", color="white")
+gpXYZ <- gpXYZ + geom_text(aes(x = mean_xlocation + 0.005, y=3.5 + 0.2, label=paste("Mean (", round(mean_xlocation * 1000, digits=0), " nm)", sep="")), color="white", angle=45, hjust="left", size=4)
+
+mode_xlocation <- xyzdens$x[xyzdens$y == max(xyzdens$y)]
+mode_y <- max(xyzdens$y)
+gpXYZ <- gpXYZ + geom_segment(aes(x=mode_xlocation, y=0, xend=mode_xlocation, yend=mode_y), linetype="dashed", color="white")
+gpXYZ <- gpXYZ + geom_text(aes(x = mode_xlocation + 0.005, y=mode_y + 0.1, label=paste("Mode (", round(mode_xlocation * 1000, digits=0), " nm)", sep="")), color="white", angle=45, hjust="left", size=4)
+gpXYZ
+```
+```{r, include=FALSE}
+load("~/Box Sync/R_data/Batch50_03_streaming.Rdata")
+```
+
+```{r}
+x_error <- Batch50_03_streaming
+mean_xlocation <- mean(x_error$XY_Streaming.Distance..um., na.rm=TRUE)
+
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_density(data=x_error, aes(`XY_Streaming.Distance..um.`), color="grey", fill="grey", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,0.5), breaks=c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,70), breaks=c(0, 10, 20, 30, 40, 50, 60, 70))
+gp <- gp + geom_segment(aes(x=mean_xlocation, y=0, xend=mean_xlocation, yend=37), linetype="dashed", color="white")
+gp <- gp + geom_text(aes(x = mean_xlocation + 0.005, y=37 + 0.2, label=paste("Mean (", round(mean_xlocation * 1000, digits=0), " nm)", sep="")), color="white", angle=45, hjust="left", size=4)
+gp
+```
+
+```{r}
+x1 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "101515.C3_ESC", ]
+x2 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "013116.2G8_ESC", ]
+x3 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "050917.2B4_ESC", ]
+
+
+gpXY <- ggplot_setup(TRUE)
+gpXY <- gpXY + geom_density(data=x1, aes(`Corrected XY_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gpXY <- gpXY + geom_density(data=x2, aes(`Corrected XY_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0)
+gpXY <- gpXY + geom_density(data=x3, aes(`Corrected XY_Distance (um)`), color="orange", fill="orange", alpha=0.3, size=1.0)
+gpXY
+
+gpXYZ <- ggplot_setup(TRUE)
+gpXYZ <- gpXYZ + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.5), breaks=c(0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5)) + xlab("3D Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,4), breaks=c(0, 1, 2, 3, 4))
+gpXYZ <- gpXYZ + geom_density(data=x2, aes(`Corrected XYZ_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0)
+gpXYZ <- gpXYZ + geom_density(data=x3, aes(`Corrected XYZ_Distance (um)`), color="orange", fill="orange", alpha=0.3, size=1.0)
+gpXYZ
+
+gp3 <- ggplot_setup(TRUE)
+gp3 <- gp3 + geom_density(data=x1, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0) + scale_x_continuous(limits=c(0,1.5), breaks=c(0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5)) + xlab("3D Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,4), breaks=c(0, 1, 2, 3, 4))
+gp3
+
+length(unique(x1$C1_Image))
+length(unique(x2$C1_Image))
+length(unique(x3$C1_Image))
+```
+
+```{r fig.width=4, fig.height=6, echo=FALSE}
+
+par(mfrow = c(1,2))
+x1 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == "FALSE" & Sox2_data$Cell_Line == "101515.C3_ESC", ]
+x2 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == "FALSE" & Sox2_data$Cell_Line == "013116.2G8_ESC", ]
+x3 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == "FALSE" & Sox2_data$Cell_Line == "050917.2B4_ESC", ]
+
+df <- rbind(x1, x2, x3)
+df$Cell_Line <- factor(df$Cell_Line, levels=c("101515.C3_ESC", "013116.2G8_ESC", "050917.2B4_ESC"), ordered=FALSE)
+
+df2 <- data.frame(matrix(ncol=3, nrow=327))
+colnames(df2) <- c("Cell_Line", "C1_Image", "Mean 3D_Distance (um)")
+df2$Cell_Line == ""
+images <- unique(df$C1_Image)
+for (i in 1:length(images)){
+  df2[i, "Cell_Line"] <- toString(df[df$C1_Image == images[i], "Cell_Line"][1])
+  df2[i, "C1_Image"] <- images[i]
+  df2[i, "Mean 3D_Distance (um)"] <- mean(df[df$C1_Image == images[i], "Corrected XYZ_Distance (um)"], na.rm=TRUE)
+}
+df2$Cell_Line <- factor(df2$Cell_Line, levels=c("101515.C3_ESC", "013116.2G8_ESC", "050917.2B4_ESC"), ordered=FALSE)
+
+gp <- ggplot(data=df, aes(y=`Corrected XYZ_Distance (um)`, x=`Cell_Line`)) + theme(panel.background = element_blank(),
+                           title = element_text(size=10, face="bold", color="white"),
+                           plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"),
+                           plot.background = element_rect(fill="black", color=NULL),
+                           panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(),
+                           axis.line.x = element_line(size=1.2, color="white"),
+                           axis.line.y = element_line(size=1.2, color="white"),
+                           axis.text.x = element_text(size=14, color="white"),
+                           axis.title.x=element_text(size=14, face="bold", color="white"),
+                           axis.text.y = element_text(size=14, color="white"),
+                           axis.title.y=element_text(size=14, face="bold", color="white"),
+                           axis.ticks = element_line(color="white"))
+                           aspect.ratio = 1.75
+gp <- gp + stat_boxplot(geom='errorbar', col="white", width=0.5) + geom_boxplot(color="white", fill=c("lightblue", "salmon", "orange"), outlier.shape=NA) + scale_y_continuous(limits=c(0,1.5)) + ylab("Mean 3D Distance (um)")
+gp
+
+gp2 <- ggplot(data=df2, aes(y=`Mean 3D_Distance (um)`, x=`Cell_Line`)) + theme(panel.background = element_blank(),
+                           title = element_text(size=10, face="bold", color="white"),
+                           plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"),
+                           plot.background = element_rect(fill="black", color=NULL),
+                           panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(),
+                           axis.line.x = element_line(size=1.2, color="white"),
+                           axis.line.y = element_line(size=1.2, color="white"),
+                           axis.text.x = element_text(size=14, color="white"),
+                           axis.title.x=element_text(size=14, face="bold", color="white"),
+                           axis.text.y = element_text(size=14, color="white"),
+                           axis.title.y=element_text(size=14, face="bold", color="white"),
+                           axis.ticks = element_line(color="white"),
+                           axis.ticks.length = unit(0.25, "cm"))
+gp2 <- gp2 + stat_boxplot(geom='errorbar', col="white", width=0.3) + geom_boxplot(color="white", fill=c("lightblue", "salmon", "orange"), outlier.shape=NA, size=1.2) + scale_y_continuous(limits=c(0,1.5)) + ylab("Mean 3D Distance (um)")
+gp2
+```
+
+###Mann Whitney U Test
+```{r}
+wilcox.test(`Mean 3D_Distance (um)` ~ `Cell_Line`, data=df2[df2$Cell_Line %in% c("101515.C3_ESC", "013116.2G8_ESC"),])
+wilcox.test(`Mean 3D_Distance (um)` ~ `Cell_Line`, data=df2[df2$Cell_Line %in% c("101515.C3_ESC", "050917.2B4_ESC"),])
+wilcox.test(`Mean 3D_Distance (um)` ~ `Cell_Line`, data=df2[df2$Cell_Line %in% c("013116.2G8_ESC", "050917.2B4_ESC"),])
+```
+
+###NPC Distance Curves
+```{r}
+x1 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "101515.C3_ESC", ]
+x2 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "013116.2G8_ESC", ]
+x3 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "101515.C3_NPC", ]
+x4 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "013116.2G8_NPC", ]
+
+
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(data=x1, aes(`Corrected XY_Distance (um)`), stat="density", color="lightblue", alpha=0.5, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gp
+gp2 <- ggplot_setup(TRUE)
+gp2 <- gp2 + geom_line(data=x1, aes(`Corrected XY_Distance (um)`), stat="density", color="lightblue", alpha=0.5, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gp2 <- gp2 + geom_density(data=x3, aes(`Corrected XY_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0)
+gp2
+
+
+gp3 <- ggplot_setup(TRUE)
+gp3 <- gp3 + geom_line(data=x2, aes(`Corrected XY_Distance (um)`), stat="density", color="salmon", alpha=0.5, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gp3
+gp4 <- ggplot_setup(TRUE)
+gp4 <- gp4 + geom_line(data=x2, aes(`Corrected XY_Distance (um)`), stat="density", color="salmon", alpha=0.5, size=1.0) + scale_x_continuous(limits=c(0,1.0), breaks=c(0, 0.25, 0.5, 0.75, 1.0)) + xlab("XY Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,6), breaks=c(0, 2, 4, 6))
+gp4 <- gp4 + geom_density(data=x4, aes(`Corrected XY_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0)
+gp4
+
+gp5 <- ggplot_setup(TRUE)
+gp5 <- gp5 + geom_line(data=x1, aes(`Corrected XYZ_Distance (um)`), stat="density", color="lightblue", alpha=0.5, size=1.0) + scale_x_continuous(limits=c(0,1.5), breaks=c(0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5)) + xlab("3D Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,4), breaks=c(0, 2, 4))
+gp5
+
+gp6 <- ggplot_setup(TRUE)
+gp6 <- gp6 + geom_line(data=x1, aes(`Corrected XYZ_Distance (um)`), stat="density", color="lightblue", alpha=0.5, size=1.0) + scale_x_continuous(limits=c(0,1.5), breaks=c(0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5)) + xlab("3D Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,4), breaks=c(0, 2, 4))
+gp6 <- gp6 + geom_density(data=x3, aes(`Corrected XYZ_Distance (um)`), color="lightblue", fill="lightblue", alpha=0.3, size=1.0)
+gp6
+
+gp7 <- ggplot_setup(TRUE)
+gp7 <- gp7 + geom_line(data=x2, aes(`Corrected XYZ_Distance (um)`), stat="density", color="salmon", alpha=0.5, size=1.0) + scale_x_continuous(limits=c(0,1.5), breaks=c(0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5)) + xlab("3D Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,4), breaks=c(0, 2, 4))
+gp7
+
+gp8 <- ggplot_setup(TRUE)
+gp8 <- gp8 + geom_line(data=x2, aes(`Corrected XYZ_Distance (um)`), stat="density", color="salmon", alpha=0.5, size=1.0) + scale_x_continuous(limits=c(0,1.5), breaks=c(0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5)) + xlab("3D Distance (um)") + ylab("Normalized Density") + theme(axis.line.x = element_line(size=1.2, color="white"), axis.line.y = element_line(size=1.2, color="white")) + scale_y_continuous(limits=c(0,4), breaks=c(0, 2, 4))
+gp8 <- gp8 + geom_density(data=x4, aes(`Corrected XYZ_Distance (um)`), color="salmon", fill="salmon", alpha=0.3, size=1.0)
+gp8
+
+length(unique(x1$C1_Image))
+length(unique(x2$C1_Image))
+length(unique(x3$C1_Image))
+length(unique(x4$C1_Image))
+```
+
+```{r}
+### 101515.C3 ESCs
+x1 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "101515.C3_ESC", ]
+x2 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "013116.2G8_ESC", ]
+x3 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "101515.C3_NPC", ]
+x4 <- Sox2_data[Sox2_data$`Time_Interval (sec)` == 20 & Sox2_data$Sync == FALSE & Sox2_data$Cell_Line == "013116.2G8_NPC", ]
+
+images <- unique(x1$C1_Image)
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x1[x1$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac1 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac1[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac1[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac1[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20),y=unlist(ac1[1,])), color="lightblue", size=1.0) + xlab("Time lag (sec)") + ylab("Autocorrelation") + scale_x_continuous(limits=c(0, 1600)) + scale_y_continuous(limits=c(-0.25, 1))
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20), ymin=unlist(ac1[2,]), ymax=unlist(ac1[3,])), fill="lightblue", alpha=0.6)
+
+### 013116.2G8 ESCs
+images <- unique(x2$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x2[x2$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac2 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac2[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac2[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac2[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac2) - 1, by=1) * 20),y=unlist(ac2[1,])), color="salmon", size=1.0)
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac2) - 1, by=1) * 20), ymin=unlist(ac2[2,]), ymax=unlist(ac2[3,])), fill="salmon", alpha=0.6)
+
+### 101515.C3 NPCs
+images <- unique(x3$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x3[x3$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac3 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac3[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac3[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac3[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac3) - 1, by=1) * 20),y=unlist(ac3[1,])), color="lightblue", size=1.0, linetype="dashed")
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac3) - 1, by=1) * 20), ymin=unlist(ac3[2,]), ymax=unlist(ac3[3,])), fill="lightblue", alpha=0.6)
+
+### 013116.2G8 NPCs
+images <- unique(x4$C1_Image)
+
+m <- matrix(nrow = length(images), ncol = 100, data = NA)
+for (i in 1:length(images)){
+  x_sub <- x4[x4$C1_Image == images[i],]
+  frames <- x_sub$`C1_T Value (frame)`
+  for (j in frames){
+    m[i, j] <- x_sub[x_sub$`C1_T Value (frame)` == j, "Corrected XYZ_Distance (um)"]
+  }
+}
+maxlag <- 40
+numframes <- 100
+df <- m
+ndata <- length(m[!is.na(m)])
+
+nseries <- nrow(df)
+m_value <- mean(df, na.rm=TRUE)
+variance <- sd(df, na.rm=TRUE)^2
+
+ac4 <- data.frame(matrix(data = NA, nrow=3, ncol=(maxlag + 1)))
+for (i in 0:maxlag){
+  print(i)
+  values <- data.frame(Data1=double(), Data2=double())
+  for (j in 1:nseries){
+    for (t in 1:(numframes - i)){
+      values <- rbind(values, c(df[j,t],df[j, (t + i)]))
+    }
+  }
+  colnames(values) <- c("x1", "x2")
+  ac4[1, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$estimate
+  ac4[2, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[1]
+  ac4[3, i + 1] <- cor.test(x=values[,1], y=values[,2], na.rm=TRUE)$conf.int[2]
+}
+colnames(values) <- c("x1", "x2")
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac4) - 1, by=1) * 20),y=unlist(ac4[1,])), color="salmon", size=1.0, linetype="dashed")
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac4) - 1, by=1) * 20), ymin=unlist(ac4[2,]), ymax=unlist(ac4[3,])), fill="salmon", alpha=0.6)
+gp
+```
+
+```{r}
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20),y=unlist(ac1[1,])), color="lightblue", size=1.0) + xlab("Time lag (sec)") + ylab("Autocorrelation") + scale_x_continuous(limits=c(0, 800)) + scale_y_continuous(limits=c(-0.25, 1))
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20), ymin=unlist(ac1[2,]), ymax=unlist(ac1[3,])), fill="lightblue", alpha=0.6)
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac2) - 1, by=1) * 20),y=unlist(ac2[1,])), color="salmon", size=1.0)
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac2) - 1, by=1) * 20), ymin=unlist(ac2[2,]), ymax=unlist(ac2[3,])), fill="salmon", alpha=0.6)
+gp
+```
+
+```{r}
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20),y=unlist(ac1[1,])), color="lightblue", size=1.0) + xlab("Time lag (sec)") + ylab("Autocorrelation") + scale_x_continuous(limits=c(0, 800)) + scale_y_continuous(limits=c(-0.25, 1))
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac1) - 1, by=1) * 20), ymin=unlist(ac1[2,]), ymax=unlist(ac1[3,])), fill="lightblue", alpha=0.6)
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac2) - 1, by=1) * 20),y=unlist(ac2[1,])), color="salmon", size=1.0)
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac2) - 1, by=1) * 20), ymin=unlist(ac2[2,]), ymax=unlist(ac2[3,])), fill="salmon", alpha=0.6)
+
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac3) - 1, by=1) * 20),y=unlist(ac3[1,])), color="lightblue", size=1.0, linetype="dashed")
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac3) - 1, by=1) * 20), ymin=unlist(ac3[2,]), ymax=unlist(ac3[3,])), fill="lightblue", alpha=0.6)
+gp <- gp + geom_line(aes(x=(seq(0,ncol(ac4) - 1, by=1) * 20),y=unlist(ac4[1,])), color="salmon", size=1.0, linetype="dashed")
+gp <- gp + geom_ribbon(aes(x=(seq(0,ncol(ac4) - 1, by=1) * 20), ymin=unlist(ac4[2,]), ymax=unlist(ac4[3,])), fill="salmon", alpha=0.6)
+gp
+```

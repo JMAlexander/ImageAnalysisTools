@@ -1,0 +1,77 @@
+---
+title: "Batch50_MS2analysis"
+author: "Jeff Alexander"
+date: "7/19/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load('~/Box Sync/R_data/Batch50_MS2_analysis.Rdata')
+source('~/Box Sync/Scripts/R/Scripts/Rfunctions.R');
+```
+
+```{r}
+length <- nrow(Batch50_MS2data)
+Batch50_MS2data_full <- data.frame(Batch50_MS2data, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "", stringsAsFactors = FALSE)
+colnames(Batch50_MS2data_full)[18:37] <- colnames(Batch50_data_combined_pairs_trackmate)[25:44]
+colnames(Batch50_MS2data_full)[38] <- colnames(Batch50_data_combined_pairs_trackmate)[1]
+for (i in 1:length){
+  if (Batch50_MS2data_full[i, "Image"] %in% Batch50_data_combined_pairs_trackmate$C1_Image){
+    if (Batch50_MS2data_full[i, "T.Value..frame."] %in% Batch50_data_combined_pairs_trackmate[Batch50_data_combined_pairs_trackmate$C1_Image == Batch50_MS2data_full[i,"Image"], "C1_T Value (frame)"]){
+      im <- Batch50_MS2data_full[i, "Image"]
+      t <- Batch50_MS2data_full[i, "T.Value..frame."]
+      Batch50_MS2data_full[i, 18:37] <- Batch50_data_combined_pairs_trackmate[Batch50_data_combined_pairs_trackmate$C1_Image == im & Batch50_data_combined_pairs_trackmate$`C1_T Value (frame)` == t, 25:44]
+      Batch50_MS2data_full[i, 38] <- Batch50_data_combined_pairs_trackmate[Batch50_data_combined_pairs_trackmate$C1_Image == im & Batch50_data_combined_pairs_trackmate$`C1_T Value (frame)` == t, 1]
+    }
+  }
+}
+```
+
+```{r}
+x <- Batch50_MS2data_full
+images <- unique(x$Image)
+for (k in 1:length(images)){current_line <- unique(x[x$Image == images[k], "Cell_Line"]);
+plot(x[x$Image == images[k], "T.Value..frame."], x[x$Image == images[k], "Corrected XY_Distance (um)"], type="p", pch=20, sub=paste(current_line, images[k]), ylab="XY Distance (um)", xlab="Time (sec)", ylim=c(0,1.5), xlim=c(0,100));
+lines(x[x$Image == images[k], "T.Value..frame."], x[x$Image == images[k], "Norm_Height_Filter"], col="lightblue");
+}
+```
+
+```{r}
+length <- nrow(Batch52_MS2data)
+Batch52_MS2data_full <- data.frame(Batch52_MS2data, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "", stringsAsFactors = FALSE)
+colnames(Batch52_MS2data_full)[18:37] <- colnames(Batch52_data_combined_pairs_trackmate)[25:44]
+colnames(Batch52_MS2data_full)[38] <- colnames(Batch52_data_combined_pairs_trackmate)[1]
+for (i in 1:length){
+  if (Batch52_MS2data_full[i, "Image"] %in% Batch52_data_combined_pairs_trackmate$C1_Image){
+    if (Batch52_MS2data_full[i, "T.Value..frame."] %in% Batch52_data_combined_pairs_trackmate[Batch52_data_combined_pairs_trackmate$C1_Image == Batch52_MS2data_full[i,"Image"], "C1_T Value (frame)"]){
+      im <- Batch52_MS2data_full[i, "Image"]
+      t <- Batch52_MS2data_full[i, "T.Value..frame."]
+      Batch52_MS2data_full[i, 18:37] <- Batch52_data_combined_pairs_trackmate[Batch52_data_combined_pairs_trackmate$C1_Image == im & Batch52_data_combined_pairs_trackmate$`C1_T Value (frame)` == t, 25:44]
+      Batch52_MS2data_full[i, 38] <- Batch52_data_combined_pairs_trackmate[Batch52_data_combined_pairs_trackmate$C1_Image == im & Batch52_data_combined_pairs_trackmate$`C1_T Value (frame)` == t, 1]
+    }
+  }
+}
+```
+
+```{r}
+x <- Batch52_MS2data_full
+images <- unique(x$Image)
+for (k in 1:length(images)){current_line <- unique(x[x$Image == images[k], "Cell_Line"]);
+plot(x[x$Image == images[k], "T.Value..frame."], x[x$Image == images[k], "Corrected XY_Distance (um)"], type="p", pch=20, sub=paste(current_line, images[k]), ylab="XY Distance (um)", xlab="Time (sec)", ylim=c(0,1.5), xlim=c(0,100));
+lines(x[x$Image == images[k], "T.Value..frame."], x[x$Image == images[k], "Norm_Height_Filter"], col="lightblue");
+}
+```
+
+###Bar Graph for % of Time Bursting
+```{r}
+##Values from previous analysis 10.2% for Sox2 MS2/WT and 0.3% for Sox2 WT/WT
+
+
+df <- data.frame('Cell_Line'=c("WT/WT", "MS2/WT"), 'Burst_Percentage'=c(0.3, 10.2))
+
+gp <- ggplot_setup(TRUE)
+gp <- gp + geom_bar(data=df, stat="identity", aes(x=`Cell_Line`, y=`Burst_Percentage`), col="lightgrey", fill="lightgrey") + ylab("Percent Time Transcriptionally Bursting") + scale_y_continuous(limits=c(0, 20))
+gp
+```
+    

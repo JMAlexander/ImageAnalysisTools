@@ -1,0 +1,227 @@
+---
+title: "Fixed Cells 101515.C3 ESCs Analysis (Batch50 and 51)"
+author: "Jeff Alexander"
+date: "07/05/17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plyr)
+load("~/Library/Mobile Documents/com~apple~CloudDocs/Sox2_data_071117.RData")
+```
+
+###Folder with data files
+```{r}
+datdir <- "/Users/Jeff/Desktop/07_01_2017_Batch50/Stacks/0_spots/"
+batch <- "Batch50_02"
+```
+
+###Import bead data and filter out positions at the edges
+```{r}
+##
+c1_dat <- paste(datdir, "C1_", batch, ".txt", sep="")
+cell_C1 <- read.delim(c1_dat, sep = "\t", stringsAsFactors = FALSE)
+cell_C1 <- cell_C1[,1:5]
+cell_C1 <- cell_C1[!(cell_C1$C1_Position_X == 0 | cell_C1$C1_Position_Y == 0 | cell_C1$C1_Position_Z == 0),]
+cell_C1 <- cell_C1[!(cell_C1$C1_Position_X == 511 | cell_C1$C1_Position_Y == 511 | cell_C1$C1_Position_Z == 30),]
+head(cell_C1)
+##
+c2_dat <- paste(datdir, "C2_", batch, ".txt", sep="")
+cell_C2 <- read.delim(c2_dat, sep = "\t", stringsAsFactors = FALSE)
+cell_C2 <- cell_C2[,1:5]
+cell_C2 <- cell_C2[!(cell_C2$C2_Position_X == 0 | cell_C2$C2_Position_Y == 0 | cell_C2$C2_Position_Z == 0),]
+cell_C2 <- cell_C2[!(cell_C2$C2_Position_X == 511 | cell_C2$C2_Position_Y == 511 | cell_C2$C2_Position_Z == 30),]
+head(cell_C2)
+##
+```
+
+###Match fixed_cellsbetween the three colors based on proximity
+```{r}
+images <- unique(cell_C1$C1_Image)
+fixed_cells<- data.frame()
+for (i in images){
+  c1_tab <- cell_C1[cell_C1$C1_Image == i,]
+  c2_tab <- cell_C2[cell_C2$C2_Image == i,]
+  for (j in 1:nrow(c1_tab)){
+    C1_row <- j
+    C2_row <- 0
+    all_tab <- data.frame()
+    for (k in 1:nrow(c2_tab)){
+      if (abs(c1_tab[C1_row, "C1_Position_X"] - c2_tab[k, "C2_Position_X"]) < 10.0 & abs(c1_tab[C1_row, "C1_Position_Y"] - c2_tab[k, "C2_Position_Y"]) < 10.0 & abs(c1_tab[C1_row, "C1_Position_Z"] - c2_tab[k, "C2_Position_Z"]) < 10.0){
+        C2_row <- k
+      }
+    }  
+    if (!(C2_row == 0)){
+      all_tab <- cbind(c1_tab[C1_row,], c2_tab[C2_row,])
+      fixed_cells<- rbind(fixed_cells, all_tab)
+    }
+  }
+}
+
+head(fixed_cells)
+```
+
+
+##Calculate position shifts
+```{r}
+fixed_cells<- data.frame(fixed_cells, 0, 0, 0, 0, 0, 0)
+ncol(fixed_cells)
+colnames(fixed_cells)[11:16] <- c("C1_X Value (um)", "C1_Y Value (um)", "C1_Z Value (um)", "C2_X Value (um)", "C2_Y Value (um)", "C2_Z Value (um)")
+head(fixed_cells)
+fixed_cells$`C1_X Value (um)` <- fixed_cells$C1_Position_X * 0.091; fixed_cells$`C1_Y Value (um)` <- fixed_cells$C1_Position_Y * 0.091; fixed_cells$`C1_Z Value (um)` <- fixed_cells$C1_Position_Z * 0.3;
+fixed_cells$`C2_X Value (um)` <- fixed_cells$C2_Position_X * 0.091; fixed_cells$`C2_Y Value (um)` <- fixed_cells$C2_Position_Y * 0.091; fixed_cells$`C2_Z Value (um)` <- fixed_cells$C2_Position_Z * 0.3;
+
+                     
+x_correction_offset <-  -0.0141;
+y_correction_offset <-  -0.003185;
+z_correction_offset <-   0.201;
+
+
+col_value <- ncol(fixed_cells);
+fixed_cells <- data.frame(fixed_cells, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, stringsAsFactors=FALSE);
+
+colnames(fixed_cells)[11:16] <- c("C1_X Value (um)", "C1_Y Value (um)", "C1_Z Value (um)", "C2_X Value (um)", "C2_Y Value (um)", "C2_Z Value (um)")
+colnames(fixed_cells)[(col_value + 1):(col_value + 13)] <- c("X_Distance (um)", "Y_Distance (um)", "Z_Distance (um)", "XY_Distance (um)", "XYZ_Distance (um)","C1_Corrected X_Value (um)", "C1_Corrected Y_Value (um)", "C1_Corrected Z_Value (um)", "Corrected X_Distance (um)", "Corrected Y_Distance (um)", "Corrected Z_Distance (um)", "Corrected XY_Distance (um)", "Corrected XYZ_Distance (um)");
+
+
+fixed_cells$`X_Distance (um)` <- (fixed_cells$`C1_X Value (um)` - fixed_cells$`C2_X Value (um)`);
+fixed_cells$`Y_Distance (um)` <- (fixed_cells$`C1_Y Value (um)` - fixed_cells$`C2_Y Value (um)`);
+fixed_cells$`Z_Distance (um)` <- (fixed_cells$`C1_Z Value (um)` - fixed_cells$`C2_Z Value (um)`);
+fixed_cells$`XY_Distance (um)` <- sqrt((fixed_cells$`C1_X Value (um)` - fixed_cells$`C2_X Value (um)`)^2 + (fixed_cells$`C1_Y Value (um)` - fixed_cells$`C2_Y Value (um)`)^2);
+fixed_cells$`XYZ_Distance (um)` <- sqrt((fixed_cells$`C1_X Value (um)` - fixed_cells$`C2_X Value (um)`)^2 + (fixed_cells$`C1_Y Value (um)` - fixed_cells$`C2_Y Value (um)`)^2 + (fixed_cells$`C1_Z Value (um)` - fixed_cells$`C2_Z Value (um)`)^2);
+
+fixed_cells$`C1_Corrected X_Value (um)` <- fixed_cells$`C1_X Value (um)` + x_correction_offset;
+fixed_cells$`C1_Corrected Y_Value (um)` <- fixed_cells$`C1_Y Value (um)` + y_correction_offset;
+fixed_cells$`C1_Corrected Z_Value (um)` <- fixed_cells$`C1_Z Value (um)` + z_correction_offset;
+fixed_cells$`Corrected X_Distance (um)` <- (fixed_cells$`C1_Corrected X_Value (um)` - fixed_cells$`C2_X Value (um)`);
+fixed_cells$`Corrected Y_Distance (um)` <- (fixed_cells$`C1_Corrected Y_Value (um)` - fixed_cells$`C2_Y Value (um)`);
+fixed_cells$`Corrected Z_Distance (um)` <- (fixed_cells$`C1_Corrected Z_Value (um)` - fixed_cells$`C2_Z Value (um)`);
+fixed_cells$`Corrected XY_Distance (um)` <- sqrt((fixed_cells$`C1_Corrected X_Value (um)` - fixed_cells$`C2_X Value (um)`)^2 + (fixed_cells$`C1_Corrected Y_Value (um)` - fixed_cells$`C2_Y Value (um)`)^2);
+fixed_cells$`Corrected XYZ_Distance (um)` <- sqrt((fixed_cells$`C1_Corrected X_Value (um)` - fixed_cells$`C2_X Value (um)`)^2 + (fixed_cells$`C1_Corrected Y_Value (um)` - fixed_cells$`C2_Y Value (um)`)^2 + (fixed_cells$`C1_Corrected Z_Value (um)` - fixed_cells$`C2_Z Value (um)`)^2);
+```
+
+```{r}
+length(!is.na(fixed_cells$`Corrected XY_Distance (um)`))
+hist(fixed_cells$`Corrected XY_Distance (um)`, breaks=c(0, seq(0.02, 0.8, by=0.02), 10), xlim=c(0,0.8))
+hist(fixed_cells$`Corrected XYZ_Distance (um)`, breaks=c(0, seq(0.02, 1.0, by=0.02), 10), xlim=c(0,0.8))
+```
+```{r}
+fixed_cell_101515_C3_Batch50 <- fixed_cells
+```
+
+```{r}
+datdir <- "/Users/Jeff/Desktop/07_07_2017_Batch51/Stacks/0_spots/"
+batch <- "Batch51_02"
+```
+
+###Import bead data and filter out positions at the edges
+```{r}
+##
+c1_dat <- paste(datdir, "C1_", batch, ".txt", sep="")
+cell_C1 <- read.delim(c1_dat, sep = "\t", stringsAsFactors = FALSE)
+cell_C1 <- cell_C1[,1:5]
+cell_C1 <- cell_C1[!(cell_C1$C1_Position_X == 0 | cell_C1$C1_Position_Y == 0 | cell_C1$C1_Position_Z == 0),]
+cell_C1 <- cell_C1[!(cell_C1$C1_Position_X == 511 | cell_C1$C1_Position_Y == 511 | cell_C1$C1_Position_Z == 30),]
+head(cell_C1)
+##
+c2_dat <- paste(datdir, "C2_", batch, ".txt", sep="")
+cell_C2 <- read.delim(c2_dat, sep = "\t", stringsAsFactors = FALSE)
+cell_C2 <- cell_C2[,1:5]
+cell_C2 <- cell_C2[!(cell_C2$C2_Position_X == 0 | cell_C2$C2_Position_Y == 0 | cell_C2$C2_Position_Z == 0),]
+cell_C2 <- cell_C2[!(cell_C2$C2_Position_X == 511 | cell_C2$C2_Position_Y == 511 | cell_C2$C2_Position_Z == 30),]
+head(cell_C2)
+##
+```
+
+###Match fixed_cellsbetween the three colors based on proximity
+```{r}
+images <- unique(cell_C1$C1_Image)
+fixed_cells <- data.frame()
+for (i in images){
+  c1_tab <- cell_C1[cell_C1$C1_Image == i,]
+  c2_tab <- cell_C2[cell_C2$C2_Image == i,]
+  for (j in 1:nrow(c1_tab)){
+    C1_row <- j
+    C2_row <- 0
+    all_tab <- data.frame()
+    for (k in 1:nrow(c2_tab)){
+      if (abs(c1_tab[C1_row, "C1_Position_X"] - c2_tab[k, "C2_Position_X"]) < 10.0 & abs(c1_tab[C1_row, "C1_Position_Y"] - c2_tab[k, "C2_Position_Y"]) < 10.0 & abs(c1_tab[C1_row, "C1_Position_Z"] - c2_tab[k, "C2_Position_Z"]) < 10.0){
+        C2_row <- k
+      }
+    }  
+    if (!(C2_row == 0)){
+      all_tab <- cbind(c1_tab[C1_row,], c2_tab[C2_row,])
+      fixed_cells<- rbind(fixed_cells, all_tab)
+    }
+  }
+}
+
+head(fixed_cells)
+```
+
+
+##Calculate position shifts
+```{r}
+fixed_cells<- data.frame(fixed_cells, 0, 0, 0, 0, 0, 0)
+ncol(fixed_cells)
+colnames(fixed_cells)[11:16] <- c("C1_X Value (um)", "C1_Y Value (um)", "C1_Z Value (um)", "C2_X Value (um)", "C2_Y Value (um)", "C2_Z Value (um)")
+head(fixed_cells)
+fixed_cells$`C1_X Value (um)` <- fixed_cells$C1_Position_X * 0.091; fixed_cells$`C1_Y Value (um)` <- fixed_cells$C1_Position_Y * 0.091; fixed_cells$`C1_Z Value (um)` <- fixed_cells$C1_Position_Z * 0.3;
+fixed_cells$`C2_X Value (um)` <- fixed_cells$C2_Position_X * 0.091; fixed_cells$`C2_Y Value (um)` <- fixed_cells$C2_Position_Y * 0.091; fixed_cells$`C2_Z Value (um)` <- fixed_cells$C2_Position_Z * 0.3;
+
+                     
+x_correction_offset <-  -0.0141;
+y_correction_offset <-  -0.003185;
+z_correction_offset <-   0.201;
+
+
+col_value <- ncol(fixed_cells);
+fixed_cells <- data.frame(fixed_cells, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, stringsAsFactors=FALSE);
+
+colnames(fixed_cells)[11:16] <- c("C1_X Value (um)", "C1_Y Value (um)", "C1_Z Value (um)", "C2_X Value (um)", "C2_Y Value (um)", "C2_Z Value (um)")
+colnames(fixed_cells)[(col_value + 1):(col_value + 13)] <- c("X_Distance (um)", "Y_Distance (um)", "Z_Distance (um)", "XY_Distance (um)", "XYZ_Distance (um)","C1_Corrected X_Value (um)", "C1_Corrected Y_Value (um)", "C1_Corrected Z_Value (um)", "Corrected X_Distance (um)", "Corrected Y_Distance (um)", "Corrected Z_Distance (um)", "Corrected XY_Distance (um)", "Corrected XYZ_Distance (um)");
+
+
+fixed_cells$`X_Distance (um)` <- (fixed_cells$`C1_X Value (um)` - fixed_cells$`C2_X Value (um)`);
+fixed_cells$`Y_Distance (um)` <- (fixed_cells$`C1_Y Value (um)` - fixed_cells$`C2_Y Value (um)`);
+fixed_cells$`Z_Distance (um)` <- (fixed_cells$`C1_Z Value (um)` - fixed_cells$`C2_Z Value (um)`);
+fixed_cells$`XY_Distance (um)` <- sqrt((fixed_cells$`C1_X Value (um)` - fixed_cells$`C2_X Value (um)`)^2 + (fixed_cells$`C1_Y Value (um)` - fixed_cells$`C2_Y Value (um)`)^2);
+fixed_cells$`XYZ_Distance (um)` <- sqrt((fixed_cells$`C1_X Value (um)` - fixed_cells$`C2_X Value (um)`)^2 + (fixed_cells$`C1_Y Value (um)` - fixed_cells$`C2_Y Value (um)`)^2 + (fixed_cells$`C1_Z Value (um)` - fixed_cells$`C2_Z Value (um)`)^2);
+
+fixed_cells$`C1_Corrected X_Value (um)` <- fixed_cells$`C1_X Value (um)` + x_correction_offset;
+fixed_cells$`C1_Corrected Y_Value (um)` <- fixed_cells$`C1_Y Value (um)` + y_correction_offset;
+fixed_cells$`C1_Corrected Z_Value (um)` <- fixed_cells$`C1_Z Value (um)` + z_correction_offset;
+fixed_cells$`Corrected X_Distance (um)` <- (fixed_cells$`C1_Corrected X_Value (um)` - fixed_cells$`C2_X Value (um)`);
+fixed_cells$`Corrected Y_Distance (um)` <- (fixed_cells$`C1_Corrected Y_Value (um)` - fixed_cells$`C2_Y Value (um)`);
+fixed_cells$`Corrected Z_Distance (um)` <- (fixed_cells$`C1_Corrected Z_Value (um)` - fixed_cells$`C2_Z Value (um)`);
+fixed_cells$`Corrected XY_Distance (um)` <- sqrt((fixed_cells$`C1_Corrected X_Value (um)` - fixed_cells$`C2_X Value (um)`)^2 + (fixed_cells$`C1_Corrected Y_Value (um)` - fixed_cells$`C2_Y Value (um)`)^2);
+fixed_cells$`Corrected XYZ_Distance (um)` <- sqrt((fixed_cells$`C1_Corrected X_Value (um)` - fixed_cells$`C2_X Value (um)`)^2 + (fixed_cells$`C1_Corrected Y_Value (um)` - fixed_cells$`C2_Y Value (um)`)^2 + (fixed_cells$`C1_Corrected Z_Value (um)` - fixed_cells$`C2_Z Value (um)`)^2);
+```
+
+```{r}
+length(!is.na(fixed_cells$`Corrected XY_Distance (um)`))
+hist(fixed_cells$`Corrected XY_Distance (um)`, breaks=c(0, seq(0.02, 0.8, by=0.02), 10), xlim=c(0,0.8))
+hist(fixed_cells$`Corrected XYZ_Distance (um)`, breaks=c(0, seq(0.02, 1.0, by=0.02), 10), xlim=c(0,0.8))
+```
+
+
+```{r}
+fixed_cell_101515_C3_Batch51 <- fixed_cells
+fixed_cells_total <- rbind(fixed_cell_101515_C3_Batch50, fixed_cell_101515_C3_Batch51)
+den1 <- density(fixed_cells_total$`Corrected XY_Distance (um)`)
+den2 <- density(Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC", "Corrected XY_Distance (um)"])
+
+plot(den1$x, den1$y, type="l", ylim=c(0,6), col="black", main="XY_Distance")
+lines(den2$x, den2$y, type="l", ylim=c(0,6), col="red")
+
+den1 <- density(fixed_cells_total$`Corrected XYZ_Distance (um)`)
+den2 <- density(Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC", "Corrected XYZ_Distance (um)"])
+
+plot(den1$x, den1$y, type="l", ylim=c(0,6), col="black", main="XYZ_Distance")
+lines(den2$x, den2$y, type="l", ylim=c(0,6), col="red")
+```
+
+
+
+

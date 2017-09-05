@@ -1,0 +1,25 @@
+---
+title: "Comparison of Sox2 Locus Data using Different Repressor Combos"
+author: "Jeff Alexander"
+date: "7/28/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Load Data
+```{r}
+load('/Users/Jeff/Library/Mobile Documents/com~apple~CloudDocs/Sox2_data_071117.RData')
+```
+
+###Select Appropriate Data
+```{r}
+x <- Sox2_data_unsync_20sec[Sox2_data_unsync_20sec$Cell_Line == "101515.C3_ESC",]
+x1 <- x[x$Batch %in% c("Batch06", "Batch07", "Batch46"), ]
+x2 <- x[x$Batch %in% c("Batch20", "Batch21"), ]
+
+hist(x1$`Corrected XY_Distance (um)`, xlim=c(0, 0.8), breaks=c(0, seq(0.02, 1, by=0.02), 10))
+hist(x2$`Corrected XY_Distance (um)`, xlim=c(0, 0.8), breaks=c(0, seq(0.02, 1, by=0.02), 10))
+```

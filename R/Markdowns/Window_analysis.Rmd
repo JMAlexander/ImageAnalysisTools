@@ -1,0 +1,120 @@
+---
+title: "Orion’s Analysis"
+author: "Jeff Alexander"
+date: "6/27/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+load("~/Library/Mobile Documents/com~apple~CloudDocs/Sox2_data_070617.RData")
+source('~/Library/Mobile Documents/com~apple~CloudDocs/Scripts/R/Scripts/win_size_col_0150.R')
+```
+
+
+```{r}
+x <- Sox2_data_unsync_20sec
+m1 <- mean(x[x$Cell_Line == "101515.C3_ESC", "Corrected XY_Distance (um)"])
+m2 <- mean(x[x$Cell_Line == "013116.2G8_ESC", "Corrected XY_Distance (um)"])
+ratio <- m1/m2
+
+adj_2G8 <- x[x$Cell_Line == "013116.2G8_ESC",]
+adj_2G8$`Corrected XY_Distance (um)` <- x[x$Cell_Line == "013116.2G8_ESC", "Corrected XY_Distance (um)"] * ratio
+hist(x[x$Cell_Line == "101515.C3_ESC", "Corrected XY_Distance (um)"], breaks=c(0, seq(0.02, 1.0,by=0.02), 10), xlim=c(0, 1.0))
+hist(adj_2G8$`Corrected XY_Distance (um)`, breaks=c(0, seq(0.02, 1.0,by=0.02), 10), xlim=c(0, 1.0))
+```
+
+```{r, include=FALSE}
+a <- win_size_col(x[x$Cell_Line == "101515.C3_ESC",])
+a$Window_Size <- as.numeric(a$Window_Size)
+b <- win_size_col(adj_2G8)
+b$Window_Size <- as.numeric(b$Window_Size)
+
+```
+
+```{r}
+sum_value <- sum(as.numeric(a$Window_Size))
+sum(as.numeric(a[a$Window_Size > 5, "Window_Size"]))/sum_value
+sum(as.numeric(a[a$Window_Size > 10, "Window_Size"]))/sum_value
+sum(as.numeric(a[a$Window_Size > 20, "Window_Size"]))/sum_value
+sum(as.numeric(a[a$Window_Size > 30, "Window_Size"]))/sum_value
+sum(as.numeric(a[a$Window_Size > 40, "Window_Size"]))/sum_value
+
+```
+
+```{r}
+sum_value <- sum(as.numeric(b$Window_Size))
+sum(as.numeric(b[b$Window_Size > 5, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 10, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 20, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 30, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 40, "Window_Size"]))/sum_value
+
+```
+```{r}
+m3 <- mean(x[x$Cell_Line == "101515.C3_NPC", "Corrected XY_Distance (um)"])
+ratio <- m1/m3
+adj_NPC <- x[x$Cell_Line == "101515.C3_NPC",]
+adj_NPC$`Corrected XY_Distance (um)` <- x[x$Cell_Line == "101515.C3_NPC", "Corrected XY_Distance (um)"] * ratio
+hist(x[x$Cell_Line == "101515.C3_ESC", "Corrected XY_Distance (um)"], breaks=c(0, seq(0.02, 1.0,by=0.02), 10), xlim=c(0, 1.0))
+hist(adj_NPC$`Corrected XY_Distance (um)`, breaks=c(0, seq(0.02, 1.0,by=0.02), 10), xlim=c(0, 1.0))
+```
+
+```{r}
+sum_value <- sum(as.numeric(b$Window_Size))
+sum(as.numeric(b[b$Window_Size > 5, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 10, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 20, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 30, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 40, "Window_Size"]))/sum_value
+
+```
+
+```{r, include=FALSE}
+win <- win_size_col(adj_NPC)
+win$Window_Size <- as.numeric(win$Window_Size)
+sum_value <- sum(as.numeric(win$Window_Size))
+```
+
+```{r}
+sum(as.numeric(b[b$Window_Size > 5, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 10, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 20, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 30, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 40, "Window_Size"]))/sum_value
+
+```
+
+```{r, include=FALSE}
+NPC_2G8 <- x[x$Cell_Line == "013116.2G8_NPC",]
+
+win <- win_size_col(NPC_2G8)
+win$Window_Size <- as.numeric(win$Window_Size)
+sum_value <- sum(as.numeric(win$Window_Size))
+```
+
+```{r}
+sum(as.numeric(b[b$Window_Size > 5, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 10, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 20, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 30, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 40, "Window_Size"]))/sum_value
+
+```
+
+```{r, include=FALSE}
+SCR_del <- x[x$Cell_Line == "022616.1C5_ESC",]
+
+win <- win_size_col(SCR_del)
+win$Window_Size <- as.numeric(win$Window_Size)
+sum_value <- sum(as.numeric(win$Window_Size))
+```
+
+
+```{r}
+sum_value <- sum(as.numeric(b$Window_Size))
+sum(as.numeric(b[b$Window_Size > 5, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 10, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 20, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 30, "Window_Size"]))/sum_value
+sum(as.numeric(b[b$Window_Size > 40, "Window_Size"]))/sum_value
+```

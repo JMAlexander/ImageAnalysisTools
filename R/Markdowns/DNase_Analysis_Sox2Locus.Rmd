@@ -1,0 +1,96 @@
+---
+title: "DNase_Sensitivity_Analysis_SoxLocus"
+author: "Jeff Alexander"
+date: "8/15/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load("~/Box Sync/R_data/Sox2_DNase_data.RData")
+library(ggplot2)
+source('~/Box Sync/Scripts/R/Scripts/Rfunctions.R');
+```
+
+
+### Set up array locations
+```{r}
+Sox2_8C <- 34540785
+Sox2_117T <- 34665702
+Sox2_43T <- 34592845
+Sox2_164T <- 34712768
+Sox2_242T <- 34790370
+
+Sox2_8C117Tlength <- Sox2_117T - Sox2_8C
+Sox2_43T164Tlength <- Sox2_164T - Sox2_43T
+Sox2_117T242Tlength <- Sox2_242T - Sox2_117T
+```
+
+###DNase Signal Analysis
+```{r}
+
+df <- data.frame(matrix(ncol=4, nrow=6))
+colnames(df) <- c("Cell_Line", "Rep", "DNase_Sig", "DNase_HotSpot")
+df$Cell_Line <- c("101515.C3_ESC", "013116.2G8_ESC", "050917.2B4_ESC")
+df$Rep <- c("Rep1", "Rep1", "Rep1", "Rep2", "Rep2", "Rep2")
+df$Cell_Line <- factor(df$Cell_Line, levels=c("101515.C3_ESC", "013116.2G8_ESC", "050917.2B4_ESC"), ordered=FALSE)
+
+
+df[df$Cell_Line == "101515.C3_ESC" & df$Rep == "Rep1", "DNase_Sig"] <- sum(chr3_wig_rep1[chr3_wig_rep1$Genome_Loc >= Sox2_8C & chr3_wig_rep1$Genome_Loc < Sox2_117T, "DNase_Sig"])
+df[df$Cell_Line == "101515.C3_ESC" & df$Rep == "Rep2", "DNase_Sig"] <- sum(chr3_wig_rep2[chr3_wig_rep2$Genome_Loc >= Sox2_8C & chr3_wig_rep2$Genome_Loc < Sox2_117T, "DNase_Sig"])
+
+df[df$Cell_Line == "013116.2G8_ESC" & df$Rep == "Rep1", "DNase_Sig" ] <- sum(chr3_wig_rep1[chr3_wig_rep1$Genome_Loc >= Sox2_43T & chr3_wig_rep1$Genome_Loc < Sox2_164T, "DNase_Sig"])
+df[df$Cell_Line == "013116.2G8_ESC" & df$Rep == "Rep2", "DNase_Sig"] <- sum(chr3_wig_rep2[chr3_wig_rep2$Genome_Loc >= Sox2_43T & chr3_wig_rep2$Genome_Loc < Sox2_164T, "DNase_Sig"])
+
+df[df$Cell_Line == "050917.2B4_ESC" & df$Rep == "Rep1", "DNase_Sig"] <- sum(chr3_wig_rep1[chr3_wig_rep1$Genome_Loc >= Sox2_117T & chr3_wig_rep1$Genome_Loc < Sox2_242T, "DNase_Sig"])
+df[df$Cell_Line == "050917.2B4_ESC" & df$Rep == "Rep2", "DNase_Sig"] <- sum(chr3_wig_rep2[chr3_wig_rep2$Genome_Loc >= Sox2_117T & chr3_wig_rep2$Genome_Loc < Sox2_242T, "DNase_Sig"])
+```
+
+###DNase Hotspot Analysis
+```{r}
+df[df$Cell_Line == "101515.C3_ESC" & df$Rep == "Rep1", "DNase_HotSpot"] <- sum(chr3_hotspots_rep1[chr3_hotspots_rep1$Start >= Sox2_8C & chr3_hotspots_rep1$End < Sox2_117T, "Length"]) / Sox2_8C117Tlength
+df[df$Cell_Line == "101515.C3_ESC" & df$Rep == "Rep2", "DNase_HotSpot"] <- sum(chr3_hotspots_rep2[chr3_hotspots_rep2$Start >= Sox2_8C & chr3_hotspots_rep2$End < Sox2_117T, "Length"]) / Sox2_8C117Tlength
+
+df[df$Cell_Line == "013116.2G8_ESC" & df$Rep == "Rep1", "DNase_HotSpot" ] <- sum(chr3_hotspots_rep1[chr3_hotspots_rep1$Start >= Sox2_43T & chr3_hotspots_rep1$End < Sox2_164T, "Length"]) / Sox2_43T164Tlength
+df[df$Cell_Line == "013116.2G8_ESC" & df$Rep == "Rep2", "DNase_HotSpot"] <- sum(chr3_hotspots_rep2[chr3_hotspots_rep2$Start >= Sox2_43T & chr3_hotspots_rep2$End < Sox2_164T, "Length"]) / Sox2_43T164Tlength
+
+df[df$Cell_Line == "050917.2B4_ESC" & df$Rep == "Rep1", "DNase_HotSpot"] <- sum(chr3_hotspots_rep1[chr3_hotspots_rep1$Start >= Sox2_117T & chr3_hotspots_rep1$End < Sox2_242T, "Length"]) / Sox2_117T242Tlength
+df[df$Cell_Line == "050917.2B4_ESC" & df$Rep == "Rep2", "DNase_HotSpot"] <- sum(chr3_hotspots_rep2[chr3_wig_rep2$Start >= Sox2_117T & chr3_hotspots_rep2$End < Sox2_242T, "Length"]) / Sox2_117T242Tlength
+```
+
+###Make Plots
+```{r fig.width=4, fig.height=6}
+gp <- ggplot(data=df, aes(y=`DNase_Sig`, x=`Cell_Line`)) + theme(panel.background = element_blank(),
+                           title = element_text(size=10, face="bold", color="white"),
+                           plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"),
+                           plot.background = element_rect(fill="black", color=NULL),
+                           panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(),
+                           axis.line.x = element_line(size=1.2, color="white"),
+                           axis.line.y = element_line(size=1.2, color="white"),
+                           axis.text.x = element_text(size=14, color="white"),
+                           axis.title.x=element_text(size=14, face="bold", color="white"),
+                           axis.text.y = element_text(size=14, color="white"),
+                           axis.title.y=element_text(size=14, face="bold", color="white"),
+                           axis.ticks = element_line(color="white"),
+                           axis.ticks.length = unit(0.25, "cm"))
+gp <- gp + geom_jitter(position = position_jitter(0.1), col=c("lightblue", "salmon", "orange", "lightblue", "salmon", "orange"), size=4) + ylab("DNase Signal per kb")
+gp
+
+gp2 <- ggplot(data=df, aes(y=`DNase_HotSpot`, x=`Cell_Line`)) + theme(panel.background = element_blank(),
+                           title = element_text(size=10, face="bold", color="white"),
+                           plot.margin = unit(c(0.5,0.5,0.5,0.5), "cm"),
+                           plot.background = element_rect(fill="black", color=NULL),
+                           panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(),
+                           axis.line.x = element_line(size=1.2, color="white"),
+                           axis.line.y = element_line(size=1.2, color="white"),
+                           axis.text.x = element_text(size=14, color="white"),
+                           axis.title.x=element_text(size=14, face="bold", color="white"),
+                           axis.text.y = element_text(size=14, color="white"),
+                           axis.title.y=element_text(size=14, face="bold", color="white"),
+                           axis.ticks = element_line(color="white"),
+                           axis.ticks.length = unit(0.25, "cm"))
+gp2 <- gp2 + geom_jitter(position = position_jitter(0.1), col=c("lightblue", "salmon", "orange", "lightblue", "salmon", "orange"), size=4) + ylab("Percent DNase Hypersensitive")
+gp2
+```

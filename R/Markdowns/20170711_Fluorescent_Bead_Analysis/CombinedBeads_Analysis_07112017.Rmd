@@ -1,0 +1,127 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+load("~/Library/Mobile Documents/com~apple~CloudDocs/Bead_data_07112017.Rdata")
+```
+
+
+```{r}
+par(mfrow=c(3,2), cex.main=0.8, cex=0.6, pch=16);
+fit <- lm(all_beads$`C2_C1_X Difference (um)` ~ all_beads$`C1_Z Value (um)`)
+plot(all_beads$`C1_Z Value (um)`, all_beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C2C1X Shift")
+abline(fit)
+fit
+
+fit <- lm(all_beads$`C3_C1_X Difference (um)` ~ all_beads$`C1_Z Value (um)`)
+plot(all_beads$`C1_Z Value (um)`, all_beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C3C1X Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+fit <- lm(all_beads$`C2_C1_Y Difference (um)` ~ all_beads$`C1_Z Value (um)`)
+plot(all_beads$`C1_Z Value (um)`, all_beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C2C1Y Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C3_C1_Y Difference (um)` ~ all_beads$`C1_Z Value (um)`)
+plot(all_beads$`C1_Z Value (um)`, all_beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Z Position", ylab="C3C1Y Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C2_C1_Z Difference (um)` ~ all_beads$`C1_Z Value (um)`)
+plot(all_beads$`C1_Z Value (um)`, all_beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Z Position", ylab="C2C1Z Shift")
+abline(fit)
+text(2, 0.25, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C3_C1_Z Difference (um)` ~ all_beads$`C1_Z Value (um)`)
+plot(all_beads$`C1_Z Value (um)`, all_beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Z Position", ylab="C3C1Z Shift")
+abline(fit)
+text(2, 0.25, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C2_C1_X Difference (um)` ~ all_beads$`C1_X Value (um)`)
+plot(all_beads$`C1_X Value (um)`, all_beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C2C1X Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C3_C1_X Difference (um)` ~ all_beads$`C1_X Value (um)`)
+plot(all_beads$`C1_X Value (um)`, all_beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C3C1X Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C2_C1_Y Difference (um)` ~ all_beads$`C1_X Value (um)`)
+plot(all_beads$`C1_X Value (um)`, all_beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C2C1Y Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C3_C1_Y Difference (um)` ~ all_beads$`C1_X Value (um)`)
+plot(all_beads$`C1_X Value (um)`, all_beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="X Position", ylab="C3C1Y Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C2_C1_Z Difference (um)` ~ all_beads$`C1_X Value (um)`)
+plot(all_beads$`C1_X Value (um)`, all_beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="X Position", ylab="C2C1Z Shift")
+abline(fit)
+text(2, 0.25, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C3_C1_Z Difference (um)` ~ all_beads$`C1_X Value (um)`)
+plot(all_beads$`C1_X Value (um)`, all_beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="X Position", ylab="C3C1Z Shift")
+abline(fit)
+text(2, 0.25, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C2_C1_X Difference (um)` ~ all_beads$`C1_Y Value (um)`)
+plot(all_beads$`C1_Y Value (um)`, all_beads$`C2_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C2C1X Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C3_C1_X Difference (um)` ~ all_beads$`C1_Y Value (um)`)
+plot(all_beads$`C1_Y Value (um)`, all_beads$`C3_C1_X Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C3C1X Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C2_C1_Y Difference (um)` ~ all_beads$`C1_Y Value (um)`)
+plot(all_beads$`C1_Y Value (um)`, all_beads$`C2_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C2C1Y Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C3_C1_Y Difference (um)` ~ all_beads$`C1_Y Value (um)`)
+plot(all_beads$`C1_Y Value (um)`, all_beads$`C3_C1_Y Difference (um)`, ylim=c(-0.1, 0.1), xlab="Y Position", ylab="C3C1Y Shift")
+abline(fit)
+text(2, 0.08, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C2_C1_Z Difference (um)` ~ all_beads$`C1_Y Value (um)`)
+plot(all_beads$`C1_Y Value (um)`, all_beads$`C2_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Y Position", ylab="C2C1Z Shift")
+abline(fit)
+text(2, 0.25, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+fit <- lm(all_beads$`C3_C1_Z Difference (um)` ~ all_beads$`C1_Y Value (um)`)
+plot(all_beads$`C1_Y Value (um)`, all_beads$`C3_C1_Z Difference (um)`, ylim=c(-0.3, 0.3), xlab="Y Position", ylab="C3C1Z Shift");
+abline(fit)
+text(2, 0.25, paste("y=", round(fit$coefficients[1], digits = 2), "x + ", round(fit$coefficients[2]), digits=2))
+
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).

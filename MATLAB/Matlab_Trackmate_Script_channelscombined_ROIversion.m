@@ -4,11 +4,11 @@
 
 % Initialize Variables
 clc;
-image_directory = 'PATH-TO-DIRECTORY';            %% Set the image directory with the images with spots to track are
-roi_folder = 'PATH-TO-DIRECTORY';                   %% Set the roi directory
-base_name = 'BatchXX';                                  %% Set the base name of the images that are common to all images.
-output_text = 'BatchXX.txt';                            %% Set the output text name
-max_frames = XX;                                       %% Number of timepoints in movie.
+image_directory = '/Users/Jeff/Analysis_Box/08_01_2017_Batch54/Stacks/';            %% Set the image directory with the images with spots to track are
+roi_folder = '/Users/Jeff/Desktop/Analysis_Box/08_01_2017_Batch54/Batch54_singlets/';                   %% Set the roi directory
+base_name = 'Batch54';                                  %% Set the base name of the images that are common to all images.
+output_text = 'Batch54.txt';                            %% Set the output text name
+max_frames = 100;                                       %% Number of timepoints in movie.
 allow_merging = false;
 
 
@@ -20,11 +20,13 @@ gap_closing_distance = 30;
 max_gap_closing_frames = java.lang.Integer(3);
 
 %% Configure Matlab and Start Fiji
-addpath('/Users/Jeff/Scripts/MATLAB');
+addpath('/Users/Jeff/Box Sync/Scripts/MATLAB');
 addpath('/Applications/Fiji.app/scripts');
 
 %% Configure Scripts for Resetting Java Memory Heap
 javaaddpath(which('MatlabGarbageCollector.jar'));
+javaaddpath('/Applications/MATLAB_R2016a.app/java/jar/mij.jar');
+
 Miji;
 
 %% Run Trackmate through Miji

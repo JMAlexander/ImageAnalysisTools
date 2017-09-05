@@ -6,9 +6,9 @@ Miji;
 
 
 clc;
-image_directory = 'PATH-TO-DIRECTORY';
-base_name = '####';
-output_text = '###.txt';
+image_directory = '/Users/Jeff/Desktop/06_27_2017/06272017_Beads/06272017_Tetrabeads_1/';
+base_name = 'Batch49_beads';
+output_text = 'Batch49_beads.txt';
 quality = 100;
 
 C1_full_file_path = strcat(image_directory, '/C1_', output_text);
